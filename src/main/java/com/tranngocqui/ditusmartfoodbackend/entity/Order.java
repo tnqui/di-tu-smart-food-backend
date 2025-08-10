@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

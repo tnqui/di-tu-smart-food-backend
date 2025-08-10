@@ -1,5 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
+import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

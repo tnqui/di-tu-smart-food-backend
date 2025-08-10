@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: di-tu-smart-food-backend
+  profiles:
+    active: local
