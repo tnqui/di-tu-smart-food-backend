@@ -1,0 +1,121 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Environment Variables ###
+.env
+.env.local
+.env.development
+.env.production
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+### Logs ###
+logs/
+*.log
+*.log.*
+/log/
+
+### Temporary files ###
+*.tmp
+*.temp
+/temp/
+
+### Database ###
+*.db
+*.sqlite
+*.h2.db
+h2/
+
+### Redis ###
+dump.rdb
+
+### SSL Certificates ###
+*.jks
+*.p12
+*.key
+*.crt
+*.pem
+keystore/
+
+### Docker ###
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+.dockerignore
+
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+### Gradle ###
+.gradle
+gradle-app.setting
+!gradle-wrapper.jar
+
+### OS ###
+# MacOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
+*.exe
+*.msi
+*.deb
+*.rpm
+
+### Application specific ###
+# Upload files
+uploads/
+upload/
+files/
+
+# Generated documentation
+docs/generated/
+
+# Test coverage reports
+coverage/
+.nyc_output/
