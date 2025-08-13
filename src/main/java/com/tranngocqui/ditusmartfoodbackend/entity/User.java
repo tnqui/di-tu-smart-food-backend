@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,11 +22,11 @@ public class User {
     @Column(name = "full_name", length = 255)
     private String fullName;
 
-    @Email(message = "Invalid email format")
+    //    @Email(message = "Invalid email format")
     @Column(length = 100)
     private String email;
 
-    @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Invalid phone number")
+    //    @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Invalid phone number")
     @Column(length = 20)
     private String phone;
 
@@ -83,4 +85,12 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 }
