@@ -2,24 +2,18 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Role {
+public class Permission {
     @Id
     private String name;
     private String description;
-    private LocalDateTime createdAt;
-
-    @ManyToMany
-    private Set<Permission> permissions;
-
 }

@@ -19,7 +19,7 @@ public class Notification {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", columnDefinition = "UUID")
     private User user;
 
     @NotNull

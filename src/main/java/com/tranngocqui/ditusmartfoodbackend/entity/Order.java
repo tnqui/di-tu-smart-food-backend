@@ -20,7 +20,7 @@ public class Order {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", columnDefinition = "UUID")
     private User user;
 
     @Column(name = "total_amount", precision = 10, scale = 2, nullable = false)

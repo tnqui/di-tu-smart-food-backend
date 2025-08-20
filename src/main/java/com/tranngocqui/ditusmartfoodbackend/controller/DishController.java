@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/dishes")
-@CrossOrigin(origins = "*")
 public class DishController {
+
+
 }

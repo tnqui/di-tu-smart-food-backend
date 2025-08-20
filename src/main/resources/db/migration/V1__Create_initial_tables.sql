@@ -1,5 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- USERS
 CREATE TABLE users (
-  id BIGSERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name VARCHAR(255),
   email VARCHAR(100) UNIQUE,
   phone VARCHAR(20) UNIQUE,
@@ -17,90 +20,114 @@ CREATE TABLE users (
   updated_at TIMESTAMP
 );
 
+-- ROLES
 CREATE TABLE roles (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50) UNIQUE NOT NULL, -- ADMIN, CUSTOMER, STAFF
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL,
   label VARCHAR(100),
   description VARCHAR(1000),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- PERMISSIONS
+CREATE TABLE permissions (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description VARCHAR(1000)
+);
+
+-- ROLE_PERMISSIONS
+CREATE TABLE role_permissions (
+  id BIGSERIAL PRIMARY KEY,
+  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  permission_id BIGINT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+  UNIQUE (role_id, permission_id)
+);
+
+-- USER_ROLES (có assigned_at và status)
 CREATE TABLE user_roles (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  role_id INT REFERENCES roles(id) ON DELETE CASCADE,
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  status VARCHAR(50) NOT NULL,
   UNIQUE (user_id, role_id)
 );
 
-
+-- CATEGORIES
 CREATE TABLE categories (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   name VARCHAR(100) UNIQUE NOT NULL,
   description VARCHAR(1000)
 );
 
-
+-- DISHES
 CREATE TABLE dishes (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(1000),
   price NUMERIC(10, 2) NOT NULL,
   image_url VARCHAR(1000),
-  category_id INT REFERENCES categories(id),
+  category_id BIGINT REFERENCES categories(id),
   is_available BOOLEAN DEFAULT TRUE,
   discount_percent INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP
 );
 
+-- ORDERS (user_id là UUID, sửa lại)
 CREATE TABLE orders (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   total_amount NUMERIC(10, 2) NOT NULL,
-  status VARCHAR(50),  -- pending, paid, cancelled, delivered
+  status VARCHAR(50),
   note VARCHAR(1000),
   delivery_address VARCHAR(1000) NOT NULL,
-  payment_method VARCHAR(50),  -- momo, cod, zalo
+  payment_method VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ORDER_ITEMS
 CREATE TABLE order_items (
-  id SERIAL PRIMARY KEY,
-  order_id INT REFERENCES orders(id) ON DELETE CASCADE,
-  dish_id INT REFERENCES dishes(id),
+  id BIGSERIAL PRIMARY KEY,
+  order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
+  dish_id BIGINT REFERENCES dishes(id),
   quantity INT NOT NULL,
   price_at_order_time NUMERIC(10, 2) NOT NULL,
   UNIQUE (order_id, dish_id)
 );
 
+-- NOTIFICATIONS (user_id là UUID)
 CREATE TABLE notifications (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   content VARCHAR(1000) NOT NULL,
-  type VARCHAR(50) DEFAULT 'ORDER',  -- system, order, promo, payment
+  type VARCHAR(50) DEFAULT 'ORDER',
   status VARCHAR(20) DEFAULT 'UNREAD',
   redirect_url VARCHAR(1000),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   read_at TIMESTAMP
 );
 
+-- PAYMENT_TRANSACTIONS
 CREATE TABLE payment_transactions (
-  id SERIAL PRIMARY KEY,
-  order_id INT REFERENCES orders(id) ON DELETE CASCADE,
-  provider VARCHAR(50),  -- momo, zalopay
+  id BIGSERIAL PRIMARY KEY,
+  order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
+  provider VARCHAR(50),
   transaction_id VARCHAR(100) UNIQUE,
   amount NUMERIC(10,2),
-  status VARCHAR(50),  -- success, failed, pending
+  status VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- REVIEW_RATINGS (user_id là UUID)
 CREATE TABLE review_ratings (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  dish_id INT REFERENCES dishes(id) ON DELETE CASCADE,
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  dish_id BIGINT REFERENCES dishes(id) ON DELETE CASCADE,
   rating INT CHECK (rating BETWEEN 1 AND 5),
-  comment varchar(1000),
+  comment VARCHAR(1000),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id, dish_id)
 );

@@ -1,31 +1,27 @@
-package com.tranngocqui.ditusmartfoodbackend.dto.user.request;
+package com.tranngocqui.ditusmartfoodbackend.dto.auth.response;
 
+import com.tranngocqui.ditusmartfoodbackend.dto.role.response.RoleWithoutPermissionsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdateRequest {
+@Builder
+public class RegisterResponse {
+    private UUID id;
     private String fullName;
     private String email;
     private String phone;
-    private String password;
     private Boolean isEmailVerified;
     private Boolean isPhoneVerified;
     private Boolean accountStatus;
-    private Integer loginAttempts;
-    private LocalDateTime lastLoginAt;
-    private String lastLoginIp;
     private String avatarUrl;
     private String language;
-    private String timezone;
-    private List<String> roles;
+    Set<RoleWithoutPermissionsResponse> roles;
 }
