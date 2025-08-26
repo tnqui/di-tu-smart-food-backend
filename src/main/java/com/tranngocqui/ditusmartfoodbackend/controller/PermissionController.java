@@ -3,7 +3,6 @@ package com.tranngocqui.ditusmartfoodbackend.controller;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.permission.request.PermissionRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.permission.response.PermissionResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.Permission;
 import com.tranngocqui.ditusmartfoodbackend.service.permission.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/permissions")
+@RequestMapping("/admin/permissions")
 @RequiredArgsConstructor
 public class PermissionController {
     private final PermissionService permissionService;

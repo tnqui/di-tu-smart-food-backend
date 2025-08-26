@@ -2,8 +2,8 @@ package com.tranngocqui.ditusmartfoodbackend.service.user;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -12,12 +12,16 @@ import com.tranngocqui.ditusmartfoodbackend.mapper.UserMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.RoleRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -30,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final RoleMapper roleMapper;
 
     @Override
+    @PreAuthorize("hasAnyAuthority('CREATE_USER','ROLE_ADMIN')")
     public UserResponse create(UserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -57,36 +62,73 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getAll() {
         var users = userRepository.findAll();
-        return userMapper.toUserResponse(users);
+        return userMapper.toUserResponseList(users);
     }
 
     @Override
-    public UserResponse getUser(UUID id) {
-        return userMapper.toUserResponse(
-                userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+    public UserProfileResponse getUser(UUID id) {
+        return userMapper.toUserProfileResponse(
+                userRepository.findUserProfileById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
     @Override
-    public UserResponse update(UUID id, UserUpdateRequest request) {
+    public UserProfileResponse getUserByEmailOrPhone(String email, String phone) {
+        return userMapper.toUserProfileResponse(
+                userRepository.findUserProfileByEmailOrPhone(email, phone).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+    }
+
+    @Override
+    public UserProfileResponse update(UUID id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         userMapper.updateUser(user, request);
 
-        user.setPassword(request.getPassword());
+        if (request.getRoles() != null) {
+            var roles = roleRepository.findAllById(request.getRoles());
 
-        var roles = roleRepository.findAllById(request.getRoles());
+            if (request.getRoles().size() != roles.size()) {
+                throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+            }
 
-        user.setRoles(new HashSet<>(roles));
+            user.setRoles(new HashSet<>(roles));
+        }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (request.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        userRepository.save(user);
+
+        return getUser(id);
+    }
+
+    @Override
+    public UserResponse updateProfile(UUID id, UserUpdateRequest request) {
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return null;
     }
 
     @Override
     public void delete(UUID id) {
         userRepository.deleteById(id);
     }
+
+    @Override
+    public Page<UserResponse> getUsersPagination(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+
+        List<UserResponse> dtos = userMapper.toUserResponseList(users.getContent());
+
+        return new PageImpl<>(dtos, pageable, users.getTotalElements());
+    }
+
+//    @Override
+//    public Page<UserResponse> getUsersPagination(int _start, int _end) {
+//
+//        Page<User> page = userRepository.findAll(PageRequest.of(_start, _end));
+//
+//        return userMapper.toUserResponse(page);
+//    }
 
 }

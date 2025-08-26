@@ -38,15 +38,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         request ->
                                 request
-//                                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
 //                                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
 //                                        .anyRequest().authenticated()
                                         .anyRequest().permitAll()
                 );
 
-//        httpSecurity.oauth2ResourceServer(oauth2 ->
-//                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
-//        );
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+        );
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 

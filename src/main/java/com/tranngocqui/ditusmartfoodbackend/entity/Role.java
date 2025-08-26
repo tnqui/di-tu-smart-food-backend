@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 @Getter
 @Setter
+@AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@Entity
 public class Role {
     @Id
     private String name;

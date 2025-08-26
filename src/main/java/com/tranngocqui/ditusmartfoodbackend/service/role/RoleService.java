@@ -3,8 +3,6 @@ package com.tranngocqui.ditusmartfoodbackend.service.role;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.role.request.RoleRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.role.response.RoleWithoutPermissionsResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.Role;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

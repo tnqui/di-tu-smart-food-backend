@@ -5,31 +5,42 @@ import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.IntrospectRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.TokenRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.AuthenticationResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.TokenResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.IntrospectResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthenticationService;
+import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/admin/auth")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
     @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> login(@RequestBody TokenRequest loginRequest) {
+    ApiResponse<TokenResponse> login(@RequestBody TokenRequest loginRequest) {
         var result = authenticationService.token(loginRequest);
-        return ApiResponse.<AuthenticationResponse>builder()
+        return ApiResponse.<TokenResponse>builder()
                 .result(result)
+                .build();
+    }
+
+    @GetMapping("/identity")
+    public ApiResponse<UserProfileResponse> identify(@AuthenticationPrincipal Jwt jwt) {
+        String emailOrPhone = jwt.getClaim("sub"); // "admin@gmail.com"
+        return ApiResponse.<UserProfileResponse>builder()
+                .result(userService.getUserByEmailOrPhone(emailOrPhone, emailOrPhone))
                 .build();
     }
 
@@ -49,6 +60,8 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
+
+
 
 //    @PostMapping("/logout")
 //    public ResponseEntity<AuthenticationResponse> logout(@RequestBody LogoutRequest logoutRequestRequest) {

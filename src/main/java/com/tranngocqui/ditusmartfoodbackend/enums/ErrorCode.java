@@ -14,7 +14,9 @@ public enum ErrorCode {
     TIMEOUT_ERROR(9004, "Request timeout"),
     DATABASE_ERROR(9005, "Database connection error"),
     FILE_PROCESSING_ERROR(9006, "File processing error"),
-
+    SOMETHING_WENT_WRONG(9007, "Something went wrong"),
+    CANNOT_SEND_VERIFICATION_CODE(9008, "Cannot send verification code"),
+    TOO_MANY_REQUEST(9009, "Too many requests, please try again later"),
     // ========== AUTHENTICATION ERRORS (1000-1099) ==========
 
     UNAUTHENTICATED(1001, "Authentication required"),

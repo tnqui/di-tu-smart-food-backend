@@ -7,11 +7,12 @@ import lombok.experimental.FieldDefaults;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
+@NoArgsConstructor
 public class Permission {
     @Id
     private String name;

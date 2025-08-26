@@ -1,7 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.configuration;
 
+import com.tranngocqui.ditusmartfoodbackend.entity.Permission;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.enums.Role;
+import com.tranngocqui.ditusmartfoodbackend.repository.PermissionRepository;
+import com.tranngocqui.ditusmartfoodbackend.repository.RoleRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +22,14 @@ public class AppConfig {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository, PermissionRepository permissionRepository) {
         return args -> {
             if(userRepository.findByEmail("admin@gmail.com").isEmpty()) {
-                var roles = new HashSet<String>();
-                roles.add(Role.ADMIN.name());
+                Permission permission = Permission.builder()
+                        .name("ADMIN")
+                        .description("All Permissions")
+                        .build();
+                permissionRepository.save(permission);
 
                 User user = User.builder()
                         .email("admin@gmail.com")

@@ -2,10 +2,15 @@ package com.tranngocqui.ditusmartfoodbackend.exception;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -14,6 +19,12 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Value("${app.debug:false}")
+    private boolean debugMode;
+
+    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Object> handleApiException(ApiException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -21,14 +32,22 @@ public class GlobalExceptionHandler {
         body.put("status", ex.getStatus().value());
         body.put("error", ex.getStatus().getReasonPhrase());
         body.put("message", ex.getMessage());
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
         return ResponseEntity.status(ex.getStatus()).body(body);
     }
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+    ResponseEntity<ApiResponse> handleRuntimeException(Exception ex) {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
         return ResponseEntity.badRequest().body(apiResponse);
     }
 
@@ -41,6 +60,10 @@ public class GlobalExceptionHandler {
 
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
@@ -62,8 +85,43 @@ public class GlobalExceptionHandler {
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<ApiResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+
+        ApiResponse apiResponse = new ApiResponse();
+
+        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
+        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = NoHandlerFoundException.class)
+    ResponseEntity<ApiResponse> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+
+        ApiResponse apiResponse = new ApiResponse();
+
+        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
+        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
 
 //    lỗi khi gửi token đã sửa payload
 //    @ExceptionHandler(value = ParseException.class)

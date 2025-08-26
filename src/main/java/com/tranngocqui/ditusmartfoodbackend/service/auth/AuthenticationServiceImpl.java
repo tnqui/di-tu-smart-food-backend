@@ -9,10 +9,9 @@ import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.IntrospectRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.TokenRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.LogoutRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.AuthenticationResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.TokenResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.IntrospectResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.RegisterResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,13 +42,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationMapper authenticationMapper;
 
+
     @NonFinal
     @Value("${spring.security.jwt.secret}")
     protected String SIGNER_KEY;
 
     @Override
-    public AuthenticationResponse token(TokenRequest request) {
-        User user = userRepository.findByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone())
+    public TokenResponse token(TokenRequest request) {
+        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -61,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var token = generateToken(user);
 
-        return AuthenticationResponse.builder()
+        return TokenResponse.builder()
                 .token(token)
                 .authenticated(true)
                 .build();
@@ -146,7 +145,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(role -> {
-                stringJoiner.add(role.getName());
+                stringJoiner.add("ROLE_" + role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions())) {
                     role.getPermissions().forEach(permission -> {
                         stringJoiner.add(permission.getName());
