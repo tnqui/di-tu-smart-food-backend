@@ -32,6 +32,9 @@ public class SecurityConfig {
     @Value("${spring.security.jwt.secret}")
     private String secretKey;
 
+    private final TwoFactorAuthenticationProvider twoFactorAuthProvider;
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -41,8 +44,13 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
 //                                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
 //                                        .anyRequest().authenticated()
+                                        .requestMatchers("/api/auth/**", "/api/admin/test/2fa/**").permitAll()
+
                                         .anyRequest().permitAll()
                 );
+
+        httpSecurity.authenticationProvider(twoFactorAuthProvider);
+
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
@@ -65,8 +73,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
-
 }

@@ -31,6 +31,10 @@ public class User {
     private String avatarUrl;
     private String language;
     private String timezone;
+
+    private String twoFactorSecret;
+    private boolean twoFactorEnabled = false;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     @ManyToMany

@@ -1,9 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.service.user;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -14,7 +14,6 @@ import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final RoleMapper roleMapper;
 
@@ -121,6 +122,16 @@ public class UserServiceImpl implements UserService {
         List<UserResponse> dtos = userMapper.toUserResponseList(users.getContent());
 
         return new PageImpl<>(dtos, pageable, users.getTotalElements());
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
 //    @Override

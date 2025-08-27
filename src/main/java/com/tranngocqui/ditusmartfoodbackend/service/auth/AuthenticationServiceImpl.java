@@ -5,13 +5,13 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.IntrospectRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.TokenRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.LogoutRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.TokenResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.IntrospectResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.response.RegisterResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.IntrospectRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.TokenRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.LogoutRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.RegisterRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.TokenResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.IntrospectResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.RegisterResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -41,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationMapper authenticationMapper;
-
+    private final GoogleAuthenticatorService googleAuthenticatorService;
 
     @NonFinal
     @Value("${spring.security.jwt.secret}")
@@ -49,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public TokenResponse token(TokenRequest request) {
-        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone())
+        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmail(), request.getPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -138,6 +139,40 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
         return authenticationMapper.toRegisterResponse(userRepository.save(user));
+    }
+
+    @Override
+    public String generateTwoFactorSecret(User user) {
+        String secret = googleAuthenticatorService.generateSecretKey();
+        user.setTwoFactorSecret(secret);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return secret;
+    }
+
+    @Override
+    public void enableTwoFactor(User user) {
+        user.setTwoFactorEnabled(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void disableTwoFactor(User user) {
+        user.setTwoFactorEnabled(false);
+        user.setTwoFactorSecret(null);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean verifyTwoFactorCode(String secret, int code) {
+        return googleAuthenticatorService.verifyCode(secret, code);
+    }
+
+    @Override
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     private String buildScope(User user) {

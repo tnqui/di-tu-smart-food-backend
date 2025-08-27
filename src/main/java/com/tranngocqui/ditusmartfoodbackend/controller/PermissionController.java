@@ -1,8 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.controller;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.permission.request.PermissionRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.permission.response.PermissionResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.permission.request.PermissionRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.permission.response.PermissionResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.permission.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

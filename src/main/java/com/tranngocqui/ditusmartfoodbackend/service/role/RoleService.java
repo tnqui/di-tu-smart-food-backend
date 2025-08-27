@@ -1,8 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.service.role;
 
 
-import com.tranngocqui.ditusmartfoodbackend.dto.role.request.RoleRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.role.response.RoleWithoutPermissionsResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.role.request.RoleRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.role.response.RoleWithoutPermissionsResponse;
 
 import java.util.List;
 

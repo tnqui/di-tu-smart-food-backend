@@ -31,7 +31,8 @@ public enum ErrorCode {
     PASSWORD_EXPIRED(1010, "Password has expired"),
     TOO_MANY_LOGIN_ATTEMPTS(1011, "Too many failed login attempts"),
     SUCCESS(1012, "Success"),
-
+    TWO_FACTOR_REQUIRED(1013, "Two factor code required"),
+    TWO_FACTOR_MISMATCH(1014, "Two factor code does not match"),
     // ========== AUTHORIZATION ERRORS (1100-1199) ==========
     UNAUTHORIZED(1100, "Access denied"),
     INSUFFICIENT_PERMISSION(1101, "Insufficient permissions"),
@@ -60,7 +61,7 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(1304, "Username already exists"),
     INVALID_USER_STATUS(1305, "Invalid user status"),
     USER_PROFILE_INCOMPLETE(1306, "User profile is incomplete"),
-    EMAIL_OR_PHONE_IS_REQUIRED(1307, "Email or phone number is required"),
+    PHONE_IS_REQUIRED(1307, "phone number is required"),
 
     // ========== PASSWORD ERRORS (1400-1499) ==========
     PASSWORD_IS_REQUIRED(1400, "Password is required"),

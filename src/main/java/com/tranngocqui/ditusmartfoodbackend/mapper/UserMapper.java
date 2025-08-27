@@ -1,15 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.mapper;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.TokenRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.role.response.RoleWithPermissionsResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.TokenRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.RegisterRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.role.response.RoleWithPermissionsResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import org.mapstruct.*;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 

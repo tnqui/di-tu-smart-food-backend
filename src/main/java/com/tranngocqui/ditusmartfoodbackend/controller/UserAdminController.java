@@ -1,10 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.controller;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
