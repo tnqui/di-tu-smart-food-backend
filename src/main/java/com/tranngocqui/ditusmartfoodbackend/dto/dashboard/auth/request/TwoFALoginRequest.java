@@ -3,7 +3,7 @@ package com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request;
 import lombok.Data;
 
 @Data
-public class TwoFAConfirmRequest {
-    private String email;
+public class TwoFALoginRequest {
     private String code;
+    private String tempToken;
 }

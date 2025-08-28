@@ -32,6 +32,7 @@ public class AppConfig {
                 permissionRepository.save(permission);
 
                 User user = User.builder()
+                        .twoFactorEnabled(false)
                         .email("admin@gmail.com")
                         .password(passwordEncoder.encode("123aA@"))
                         .build();

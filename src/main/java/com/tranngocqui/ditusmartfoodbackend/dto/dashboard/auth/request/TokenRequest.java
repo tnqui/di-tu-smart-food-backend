@@ -9,13 +9,12 @@ import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 @AllArgsConstructor
 @Builder
 public class TokenRequest {
-    @NotBlank(message = "PHONE_IS_REQUIRED")
+
     private String email;
-    @NotBlank(message = "EMAIL_IS_REQUIRED")
+
     private String phone;
 
-    private Integer TwoFactorCode;
+    private Integer code;
 
-    @NotBlank(message = "PASSWORD_IS_REQUIRED")
     private String password;
 }

@@ -21,5 +21,7 @@ public class UserResponse {
     private Boolean accountStatus;
     private String avatarUrl;
     private String language;
+    private String twoFactorSecret;
+    private Boolean twoFactorEnabled;
 //    Set<RoleWithoutPermissionsResponse> roles;
 }

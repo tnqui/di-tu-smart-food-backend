@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginDashboardResponse {
-    boolean requiresTwoFactor;
+public class TwoFASetupResponse {
+    private String qrAuthenticationSetup;
+    private String message;
 }

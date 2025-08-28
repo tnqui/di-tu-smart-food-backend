@@ -5,13 +5,8 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.IntrospectRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.TokenRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.LogoutRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.TokenResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.IntrospectResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.RegisterResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.*;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -31,7 +26,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -48,9 +45,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${spring.security.jwt.secret}")
     protected String SIGNER_KEY;
 
+    // Lưu trữ temporary tokens cho 2FA
+    private final Map<String, String> tempTokenStore = new ConcurrentHashMap<>();
+
     @Override
     public TokenResponse token(TokenRequest request) {
-        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmail(), request.getPhone())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -59,11 +59,104 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.LOGIN_FAILED);
         }
 
-        var token = generateToken(user);
+        if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
+            // Đã bật 2FA -> chỉ trả tempToken, chưa cấp token chính thức
+            String tempToken = generateTempToken(user);
+            return TokenResponse.builder()
+                    .tempToken(tempToken)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Vui lòng nhập mã OTP để hoàn tất đăng nhập")
+                    .build();
+        } else {
+            // Chưa bật 2FA -> cấp token chính thức luôn
+            String tempToken = generateTempToken(user);
+            String secret = generateTwoFactorSecret(user); // sinh secret lưu DB
+
+            return TokenResponse.builder()
+                    .tempToken(tempToken)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Bạn cần bật 2FA để truy cập dashboard")
+                    .build();
+        }
+    }
+
+
+//    public TokenResponse token(TokenRequest request) {
+//        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmail(), request.getPhone())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+//
+//        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+//
+//        if (!authenticated) {
+//            throw new AppException(ErrorCode.LOGIN_FAILED);
+//        }
+//
+//        // Kiểm tra xem user có bật 2FA không
+//        if (user.getTwoFactorEnabled()) {
+//            // Tạo temporary token thay vì token chính thức
+//            String tempToken = generateTempToken(user);
+//
+//            return TokenResponse.builder()
+//                    .tempToken(tempToken)
+//                    .authenticated(false)
+//                    .requires2FA(true)
+//                    .message("Vui lòng nhập mã 2FA để hoàn tất đăng nhập")
+//                    .build();
+//        } else {
+//            // Không có 2FA, tạo token bình thường
+//            String token = generateToken(user);
+//
+//            return TokenResponse.builder()
+//                    .token(token)
+//                    .authenticated(true)
+//                    .requires2FA(false)
+//                    .build();
+//        }
+//    }
+
+    /**
+     * Xác thực 2FA và tạo token chính thức
+     */
+    public TokenResponse verify2FA(TwoFALoginRequest request) {
+        // Xác thực temporary token
+        String email = validateTempToken(request.getTempToken());
+
+        if (email == null) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        // Tìm user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra 2FA
+        if (!user.getTwoFactorEnabled() || user.getTwoFactorSecret() == null) {
+            throw new AppException(ErrorCode.TWO_FACTOR_NOT_ENABLED);
+        }
+
+        // Xác thực mã 2FA
+        boolean isValidCode = googleAuthenticatorService.verifyCode(
+                user.getTwoFactorSecret(),
+                Integer.parseInt(request.getCode())
+        );
+
+        if (!isValidCode) {
+            throw new AppException(ErrorCode.INVALID_TWO_FACTOR_CODE);
+        }
+
+        // Xóa temp token
+        removeTempToken(request.getTempToken());
+
+        // Tạo token chính thức
+        String token = generateToken(user);
 
         return TokenResponse.builder()
                 .token(token)
                 .authenticated(true)
+                .requires2FA(false)
+                .message("Đăng nhập thành công")
                 .build();
     }
 
@@ -72,18 +165,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getEmail())
-                //issuer thường là domain
                 .issuer("ditufood.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
-
-                .claim("scope", buildScope(user))
+//                .claim("scope", buildScope(user))
+                .claim("userId", user.getId())
+                .claim("tokenType", "ACCESS")
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
 
         try {
@@ -93,6 +185,81 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Cannot create token", e);
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Tạo temporary token cho 2FA (chỉ tồn tại 5 phút)
+     */
+    private String generateTempToken(User user) {
+        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(user.getEmail())
+                .issuer("ditufood.com")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(5, ChronoUnit.MINUTES).toEpochMilli()
+                ))
+                .claim("tokenType", "TEMP")
+                .claim("userId", user.getId())
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(jwsHeader, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            String tempToken = jwsObject.serialize();
+
+            // Lưu temp token vào store
+            tempTokenStore.put(tempToken, user.getEmail());
+
+            return tempToken;
+        } catch (JOSEException e) {
+            log.error("Cannot create temp token", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Xác thực temporary token
+     */
+    private String validateTempToken(String tempToken) {
+        try {
+            if (!tempTokenStore.containsKey(tempToken)) {
+                return null;
+            }
+
+            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+            SignedJWT signedJWT = SignedJWT.parse(tempToken);
+
+            if (!signedJWT.verify(verifier)) {
+                tempTokenStore.remove(tempToken);
+                return null;
+            }
+
+            Date expiredTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+            String tokenType = signedJWT.getJWTClaimsSet().getStringClaim("tokenType");
+
+            if (expiredTime.before(new Date()) || !"TEMP".equals(tokenType)) {
+                tempTokenStore.remove(tempToken);
+                return null;
+            }
+
+            return signedJWT.getJWTClaimsSet().getSubject();
+
+        } catch (Exception e) {
+            log.error("Error validating temp token", e);
+            tempTokenStore.remove(tempToken);
+            return null;
+        }
+    }
+
+    /**
+     * Xóa temporary token
+     */
+    private void removeTempToken(String tempToken) {
+        tempTokenStore.remove(tempToken);
     }
 
     @Override
@@ -106,15 +273,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var token = request.getToken();
 
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-
         SignedJWT signedJWT = SignedJWT.parse(token);
 
         Date expiredTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        String tokenType = signedJWT.getJWTClaimsSet().getStringClaim("tokenType");
 
-        var verified = signedJWT.verify(verifier);
+        var verified = signedJWT.verify(verifier) &&
+                expiredTime.after(new Date()) &&
+                "ACCESS".equals(tokenType);
 
         return IntrospectResponse.builder()
-                .valid(verified && expiredTime.after(new Date()))
+                .valid(verified)
                 .build();
     }
 
@@ -128,7 +297,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
             user.setEmail(input);
-
         } else {
             if (userRepository.existsByPhone(input)) {
                 throw new AppException(ErrorCode.PHONE_ALREADY_EXISTS);
@@ -189,5 +357,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             });
         }
         return stringJoiner.toString();
+    }
+
+    /**
+     * Cleanup expired temp tokens (nên chạy định kỳ)
+     */
+    public void cleanupExpiredTempTokens() {
+        tempTokenStore.entrySet().removeIf(entry -> {
+            try {
+                SignedJWT signedJWT = SignedJWT.parse(entry.getKey());
+                Date expiredTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+                return expiredTime.before(new Date());
+            } catch (Exception e) {
+                return true; // Remove invalid tokens
+            }
+        });
     }
 }

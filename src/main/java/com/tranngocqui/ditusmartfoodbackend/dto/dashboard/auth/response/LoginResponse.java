@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response;
 
+import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TokenResponse {
-    private String token;
-    private String tempToken;
-    private boolean requires2FA;
-    private String redirectUrl;
+public class LoginResponse {
+    private String accessToken;
+    private String refreshToken;
+//    private User user;
     private String message;
-    private boolean authenticated;
+    private Long expiresIn;
 }

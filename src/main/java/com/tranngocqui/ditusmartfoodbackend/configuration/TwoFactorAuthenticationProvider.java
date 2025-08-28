@@ -42,7 +42,7 @@ public class TwoFactorAuthenticationProvider implements AuthenticationProvider {
         }
 
         // Nếu user chưa bật 2FA, cho phép đăng nhập bình thường
-        if (!user.isTwoFactorEnabled()) {
+        if (!user.getTwoFactorEnabled()) {
             return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
         }
 

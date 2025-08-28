@@ -33,6 +33,8 @@ public enum ErrorCode {
     SUCCESS(1012, "Success"),
     TWO_FACTOR_REQUIRED(1013, "Two factor code required"),
     TWO_FACTOR_MISMATCH(1014, "Two factor code does not match"),
+    TWO_FACTOR_NOT_ENABLED(1015, "Two factor code is not enabled"),
+    INVALID_TWO_FACTOR_CODE(1016, "Invalid two factor code provided"),
     // ========== AUTHORIZATION ERRORS (1100-1199) ==========
     UNAUTHORIZED(1100, "Access denied"),
     INSUFFICIENT_PERMISSION(1101, "Insufficient permissions"),

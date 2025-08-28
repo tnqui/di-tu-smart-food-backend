@@ -20,7 +20,7 @@ public class RegisterResponse {
     private String phone;
     private Boolean isEmailVerified;
     private Boolean isPhoneVerified;
-    private Boolean accountStatus;
+    private Boolean enabled;
     private String avatarUrl;
     private String language;
     Set<RoleWithoutPermissionsResponse> roles;

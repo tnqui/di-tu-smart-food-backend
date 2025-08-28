@@ -10,21 +10,60 @@ import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import java.text.ParseException;
 
 public interface AuthenticationService {
-    TokenResponse token(TokenRequest loginRequest);
+    /**
+     * Đăng nhập bước 1 - xác thực email/password
+     */
+    TokenResponse token(TokenRequest request);
 
+    /**
+     * Đăng nhập bước 2 - xác thực 2FA (nếu cần)
+     */
+    TokenResponse verify2FA(TwoFALoginRequest request);
+
+    /**
+     * Đăng xuất
+     */
     boolean authenticate(LogoutRequest logoutRequest);
 
+    /**
+     * Kiểm tra token có hợp lệ không
+     */
     IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException;
 
+    /**
+     * Đăng ký tài khoản mới
+     */
     RegisterResponse register(RegisterRequest registerRequest);
 
+    /**
+     * Tạo secret key cho 2FA
+     */
     String generateTwoFactorSecret(User user);
 
+    /**
+     * Bật 2FA
+     */
     void enableTwoFactor(User user);
 
+    /**
+     * Tắt 2FA
+     */
     void disableTwoFactor(User user);
 
+    /**
+     * Xác thực mã 2FA
+     */
     boolean verifyTwoFactorCode(String secret, int code);
 
+    /**
+     * Xác thực password
+     */
     boolean validatePassword(String rawPassword, String encodedPassword);
+
+    /**
+     * Dọn dẹp temp tokens hết hạn
+     */
+    void cleanupExpiredTempTokens();
+
+
 }

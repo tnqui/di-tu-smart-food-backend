@@ -24,7 +24,7 @@ public class User {
     private String password;
     private Boolean isEmailVerified;
     private Boolean isPhoneVerified;
-    private Boolean accountStatus;
+    private boolean enabled;
     private Integer loginAttempts;
     private LocalDateTime lastLoginAt;
     private String lastLoginIp;
@@ -33,7 +33,7 @@ public class User {
     private String timezone;
 
     private String twoFactorSecret;
-    private boolean twoFactorEnabled = false;
+    private Boolean twoFactorEnabled = false;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

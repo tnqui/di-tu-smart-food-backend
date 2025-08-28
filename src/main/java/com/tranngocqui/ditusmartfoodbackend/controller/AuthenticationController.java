@@ -1,73 +1,69 @@
 package com.tranngocqui.ditusmartfoodbackend.controller;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.JOSEException;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.IntrospectRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.LoginDashboardRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.TokenRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.RegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.TokenResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.IntrospectResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.TwoFactorAuthenticationToken;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.*;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
-import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthenticationService;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.GoogleAuthenticatorService;
 import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Token;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Base64;
 
+@Slf4j
 @RestController
+@RequestMapping("admin/auth")
 @RequiredArgsConstructor
-@RequestMapping("/admin/auth")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final GoogleAuthenticatorService googleAuthenticatorService;
-    private final AuthenticationManager authenticationManager;
 
 
-    @PostMapping("/token")
-    ApiResponse<TokenResponse> token(@RequestBody TokenRequest loginRequest) {
-        var result = authenticationService.token(loginRequest);
+    /**
+     * Bước 1: Đăng nhập với email/password
+     * - Nếu không có 2FA: trả về access token
+     * - Nếu có 2FA: trả về temp token và yêu cầu nhập mã 2FA
+     */
+    @PostMapping("/login")
+    public ApiResponse<TokenResponse> authenticate(@RequestBody @Valid TokenRequest request) {
+        TokenResponse result = authenticationService.token(request);
         return ApiResponse.<TokenResponse>builder()
                 .result(result)
                 .build();
     }
 
-    @GetMapping("/identity")
-    public ApiResponse<UserProfileResponse> identify(@AuthenticationPrincipal Jwt jwt) {
-        String emailOrPhone = jwt.getClaim("sub"); // "admin@gmail.com"
-        return ApiResponse.<UserProfileResponse>builder()
-                .result(userService.getUserByEmailOrPhone(emailOrPhone, emailOrPhone))
+    /**
+     * Bước 2: Xác thực 2FA và nhận access token
+     */
+    @PostMapping("/verify-2fa")
+    public ApiResponse<TokenResponse> verify2FA(@RequestBody @Valid TwoFALoginRequest request) {
+        TokenResponse result = authenticationService.verify2FA(request);
+        return ApiResponse.<TokenResponse>builder()
+                .result(result)
                 .build();
     }
 
+    /**
+     * Kiểm tra token có hợp lệ không
+     */
     @PostMapping("/introspect")
-    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request)
+    public ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
             throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
@@ -75,61 +71,144 @@ public class AuthenticationController {
                 .build();
     }
 
+    /**
+     * Đăng ký tài khoản mới
+     */
     @PostMapping("/register")
-    ApiResponse register(@Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<RegisterResponse> register(@RequestBody @Valid RegisterRequest request) {
         var result = authenticationService.register(request);
-        return ApiResponse.builder()
+        return ApiResponse.<RegisterResponse>builder()
                 .result(result)
                 .build();
     }
 
+    /**
+     * Đăng xuất
+     */
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody LogoutRequest request) {
+        authenticationService.authenticate(request);
+        return ApiResponse.<Void>builder()
+                .message("Đăng xuất thành công")
+                .build();
+    }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam(required = false) Integer code) {
+    /**
+     * Thiết lập 2FA - Bước 1: Tạo secret key và QR code
+     */
+    @PostMapping("/2fa/setup")
+    public ApiResponse<TwoFASetupResponse> setup2FA(@RequestBody TwoFASetupRequest request) {
+        User user = userService.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        try {
-            Authentication authentication;
+        if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
+            return ApiResponse.<TwoFASetupResponse>builder()
+                    .message("2FA đã được bật cho tài khoản này")
+                    .build();
+        }
 
-            if (code != null) {
-                // Đăng nhập với 2FA
-                authentication = authenticationManager.authenticate(
-                        new TwoFactorAuthenticationToken(username, password, code)
-                );
-            } else {
-                // Đăng nhập bình thường
-                authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(username, password)
-                );
-            }
+        String secret = authenticationService.generateTwoFactorSecret(user);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        String qrCodeUrl = googleAuthenticatorService.generateQRCodeUrl(user.getEmail(), secret,"Di Tu Smart Food");
 
-            Map<String, String> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("message", "Đăng nhập thành công");
+        TwoFASetupResponse response = TwoFASetupResponse.builder()
+                .qrAuthenticationSetup(qrCodeUrl)
+                .message("Vui lòng quét mã QR và nhập mã xác thực để hoàn tất thiết lập 2FA")
+                .build();
 
-            return ResponseEntity.ok(response);
+        return ApiResponse.<TwoFASetupResponse>builder()
+                .result(response)
+                .build();
+    }
 
-        } catch (AppException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("status", "2fa_required");
-            response.put("message", "Yêu cầu mã 2FA");
-            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response);
+    /**
+     * Thiết lập 2FA - Bước 2: Xác nhận và bật 2FA
+     */
+    @PostMapping("/2fa/confirm")
+    public ApiResponse<Void> confirm2FA(@RequestBody @Valid TwoFAConfirmRequest request) {
+        User user = userService.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        } catch (BadCredentialsException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("status", "error");
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        if (user.getTwoFactorSecret() == null) {
+            return ApiResponse.<Void>builder()
+                    .code(400)
+                    .message("2FA chưa được thiết lập cho user này")
+                    .build();
+        }
+
+        boolean isCodeValid = authenticationService.verifyTwoFactorCode(
+                user.getTwoFactorSecret(),
+                Integer.parseInt(request.getCode())
+        );
+
+        if (isCodeValid) {
+            authenticationService.enableTwoFactor(user);
+            return ApiResponse.<Void>builder()
+                    .message("2FA đã được bật thành công")
+                    .build();
+        } else {
+            return ApiResponse.<Void>builder()
+                    .code(400)
+                    .message("Mã xác thực không đúng")
+                    .build();
         }
     }
 
-//    @PostMapping("/logout")
-//    public ResponseEntity<AuthenticationResponse> logout(@RequestBody LogoutRequest logoutRequestRequest) {
-//        return ResponseEntity.ok(authenticationService.logout(logoutRequestRequest));
-//    }
+    /**
+     * Tắt 2FA
+     */
+    @PostMapping("/2fa/disable")
+    public ApiResponse<Void> disable2FA(@RequestBody @Valid TwoFADisableRequest request) {
+        User user = userService.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (!user.getTwoFactorEnabled()) {
+            return ApiResponse.<Void>builder()
+                    .code(400)
+                    .message("2FA chưa được bật")
+                    .build();
+        }
+
+        boolean isCodeValid = authenticationService.verifyTwoFactorCode(
+                user.getTwoFactorSecret(),
+                Integer.parseInt(request.getCode())
+        );
+
+        if (isCodeValid) {
+            authenticationService.disableTwoFactor(user);
+            return ApiResponse.<Void>builder()
+                    .message("2FA đã được tắt thành công")
+                    .build();
+        } else {
+            return ApiResponse.<Void>builder()
+                    .code(400)
+                    .message("Mã xác thực không đúng")
+                    .build();
+        }
+    }
+
+    /**
+     * Tạo QR URL cho Google Authenticator
+     */
+    private String generateQR(String email, String secret) {
+        String issuer = "DiTuSmartFood";
+        String otpAuthUrl = String.format(
+                "otpauth://totp/%s:%s?secret=%s&issuer=%s",
+                issuer, email, secret, issuer
+        );
+
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(otpAuthUrl, BarcodeFormat.QR_CODE, 300, 300);
+
+            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+            byte[] pngData = pngOutputStream.toByteArray();
+
+            // Trả về chuỗi Base64 để frontend render <img src="data:image/png;base64,..." />
+            return Base64.getEncoder().encodeToString(pngData);
+        } catch (WriterException | IOException e) {
+            throw new RuntimeException("Không thể sinh QR code", e);
+        }
+    }
 }
