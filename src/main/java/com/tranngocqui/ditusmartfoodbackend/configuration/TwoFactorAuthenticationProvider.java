@@ -47,8 +47,7 @@ public class TwoFactorAuthenticationProvider implements AuthenticationProvider {
         }
 
         // Nếu có 2FA, yêu cầu mã xác thực
-        if (authentication instanceof TwoFactorAuthenticationToken) {
-            TwoFactorAuthenticationToken twoFactorToken = (TwoFactorAuthenticationToken) authentication;
+        if (authentication instanceof TwoFactorAuthenticationToken twoFactorToken) {
             int code = twoFactorToken.getCode();
 
             if (googleAuthService.verifyCode(user.getTwoFactorSecret(), code)) {

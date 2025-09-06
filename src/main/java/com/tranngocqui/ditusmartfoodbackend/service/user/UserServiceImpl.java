@@ -1,9 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.service.user;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @PreAuthorize("hasAnyAuthority('CREATE_USER','ROLE_ADMIN')")
-    public UserResponse create(UserRequest request) {
+    public UserResponse create(UserAdminRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
@@ -56,6 +57,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         user.setRoles(new HashSet<>(listValidRole));
+        user.setCreatedAt(LocalDateTime.now());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 
 @Configuration
@@ -32,9 +33,22 @@ public class AppConfig {
                 permissionRepository.save(permission);
 
                 User user = User.builder()
-                        .twoFactorEnabled(false)
+                        .phone("123456789")
+                        .avatarUrl("/")
+                        .updatedAt(LocalDateTime.now())
+                        .createdAt(LocalDateTime.now())
                         .email("admin@gmail.com")
-                        .password(passwordEncoder.encode("123aA@"))
+                        .password(passwordEncoder.encode("123"))
+                        .isEmailVerified(true)
+                        .isPhoneVerified(true)
+                        .twoFactorEnabled(true)
+                        .avatarUrl("/")
+                        .fullName("Admin")
+                        .language("English")
+                        .lastLoginAt(LocalDateTime.now())
+                        .lastLoginIp("127.0.0.1")
+                        .enabled(true)
+                        .timezone("America/Los_Angeles")
                         .build();
                 userRepository.save(user);
                 log.warn("admin user has been created with default password: 123aA@, please change it!");

@@ -1,9 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.service.user;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserResponse create(UserRequest request);
+    UserResponse create(UserAdminRequest request);
 
     List<UserResponse> getAll();
 

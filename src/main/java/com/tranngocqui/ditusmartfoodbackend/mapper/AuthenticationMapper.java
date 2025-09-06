@@ -1,6 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.mapper;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.RegisterResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.RegisterResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import org.mapstruct.Mapper;
 

@@ -1,8 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.mapper;
 
 
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.role.request.RoleRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.role.response.RoleWithoutPermissionsResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request.RoleRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithoutPermissionsResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

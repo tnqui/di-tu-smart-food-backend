@@ -9,62 +9,30 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "dishes")
 public class Dish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @NotNull
-    @Column(nullable = false, length = 255)
     private String name;
-
-    @Column(length = 1000)
     private String description;
-
-    @NotNull
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-
-    @Column(name = "image_url", length = 1000)
+    private BigDecimal oldPrice;
+    private Double rating;
+    private String tag;
+    private Integer stock;
+    private Integer preparationTime;
+    private Integer orderCount;
     private String imageUrl;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @Column(name = "is_available")
-    private Boolean isAvailable;
-
-    @Min(value = 0, message = "Discount percent must be at least 0")
-    @Max(value = 100, message = "Discount percent cannot exceed 100")
-    @Column(name = "discount_percent")
-    private Integer discountPercent;
-
-    @Column(name = "created_at", updatable = false)
+    private Boolean enabled;
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Dish() {
-        this.isAvailable = true;
-        this.discountPercent = 0;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
+    @ManyToMany
+    private Set<Category> categories;
 }

@@ -1,10 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.service.auth;
 
 import com.nimbusds.jose.JOSEException;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.request.*;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.TokenResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.IntrospectResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.dashboard.auth.response.RegisterResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.TokenResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.IntrospectResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.RegisterResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 
 import java.text.ParseException;

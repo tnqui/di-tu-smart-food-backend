@@ -1,11 +1,13 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
+@Getter
 public class TwoFactorAuthenticationToken extends UsernamePasswordAuthenticationToken {
     private final int code;
 
@@ -14,7 +16,4 @@ public class TwoFactorAuthenticationToken extends UsernamePasswordAuthentication
         this.code = code;
     }
 
-    public int getCode() {
-        return code;
-    }
 }
