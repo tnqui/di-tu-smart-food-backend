@@ -5,6 +5,7 @@ import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,6 +22,7 @@ public class GlobalExceptionHandler {
 
     @Value("${app.debug:false}")
     private boolean debugMode;
+
 
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
@@ -42,14 +44,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handleRuntimeException(Exception ex) {
+
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+
         if (debugMode) {
             logger.error("Exception caught", ex);
         }
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> handleNullPointerException(NullPointerException ex) {
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Có lỗi xảy ra: dữ liệu không tồn tại");
+    }
+
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException ex) {
@@ -59,6 +77,7 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse();
 
         apiResponse.setCode(errorCode.getCode());
+
         apiResponse.setMessage(errorCode.getMessage());
 
         if (debugMode) {
@@ -112,8 +131,9 @@ public class GlobalExceptionHandler {
 
         ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
-        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
+        apiResponse.setCode(ErrorCode.NOT_FOUND.getCode());
+
+        apiResponse.setMessage(ErrorCode.NOT_FOUND.getMessage());
 
         if (debugMode) {
             logger.error("Exception caught", ex);
@@ -122,19 +142,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiResponse);
     }
 
-
-//    lỗi khi gửi token đã sửa payload
-//    @ExceptionHandler(value = ParseException.class)
-//    ResponseEntity<ApiResponse> handleParseException(AppException ex) {
-//
-//        ErrorCode errorCode = ex.getErrorCode();
-//
-//        ApiResponse apiResponse = new ApiResponse();
-//
-//        apiResponse.setCode(errorCode.getCode());
-//        apiResponse.setMessage(errorCode.getMessage());
-//
-//        return ResponseEntity.badRequest().body(apiResponse);
-//    }
+    @ExceptionHandler(Throwable.class)
+    ResponseEntity<ApiResponse> handleAll(Throwable ex) {
+        logger.error("Unexpected error", ex);
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
+        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
+        return ResponseEntity.status(500).body(apiResponse);
+    }
 
 }

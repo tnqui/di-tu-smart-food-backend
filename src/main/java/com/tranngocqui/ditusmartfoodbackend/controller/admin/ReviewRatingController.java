@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/review-ratings")
+@RequestMapping("/api/admin/review-ratings")
 @CrossOrigin(origins = "*")
 public class ReviewRatingController {
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
     // ========== SYSTEM ERRORS (9000-9999) ==========
+    NOT_FOUND(404, "Not Found"),
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Exception"),
     INTERNAL_SERVER_ERROR(9001, "Internal server error"),
     INVALID_MESSAGE_KEY(9002, "Invalid message key"),
@@ -17,6 +18,9 @@ public enum ErrorCode {
     SOMETHING_WENT_WRONG(9007, "Something went wrong"),
     CANNOT_SEND_VERIFICATION_CODE(9008, "Cannot send verification code"),
     TOO_MANY_REQUEST(9009, "Too many requests, please try again later"),
+    ILLEGAL_ARGUMENTS(9011, "Illegal arguments"),
+    MAPBOX_ERROR(9013, "Mapbox Error"),
+
     // ========== AUTHENTICATION ERRORS (1000-1099) ==========
 
     UNAUTHENTICATED(1001, "Authentication required"),
@@ -35,8 +39,11 @@ public enum ErrorCode {
     TWO_FACTOR_MISMATCH(1014, "Two factor code does not match"),
     TWO_FACTOR_NOT_ENABLED(1015, "Two factor code is not enabled"),
     INVALID_TWO_FACTOR_CODE(1016, "Invalid two factor code provided"),
+    INVALID_USERNAME_OR_PASSWORD(1017, "Invalid username or password"),
+    INVALID_TOKEN_SESSION(1018, "Invalid token session"),
+
     // ========== AUTHORIZATION ERRORS (1100-1199) ==========
-    UNAUTHORIZED(1100, "Access denied"),
+    UNAUTHORIZED(1100, "Unauthorized"),
     INSUFFICIENT_PERMISSION(1101, "Insufficient permissions"),
     PERMISSION_NOT_FOUND(1102, "Permission not found"),
     ROLE_NOT_FOUND(1103, "Role not found"),
@@ -64,6 +71,7 @@ public enum ErrorCode {
     INVALID_USER_STATUS(1305, "Invalid user status"),
     USER_PROFILE_INCOMPLETE(1306, "User profile is incomplete"),
     PHONE_IS_REQUIRED(1307, "phone number is required"),
+    ADDRESS_NOT_FOUND(1308, "Address not found"),
 
     // ========== PASSWORD ERRORS (1400-1499) ==========
     PASSWORD_IS_REQUIRED(1400, "Password is required"),
@@ -75,7 +83,7 @@ public enum ErrorCode {
     PASSWORD_CONTAINS_PERSONAL_INFO(1406, "Password cannot contain personal information"),
     PASSWORD_BETWEEN_8_TO_20_CHARACTERS(1407, "Password between 8 to 20 characters"),
     PASSWORD_CONFIRMED(1408, "Please confirm your password"),
-    PASSWORD_DOES_NOT_MATCH(1409,"Password does not match"),
+    PASSWORD_DOES_NOT_MATCH(1409, "Password does not match"),
 
     // ========== FOOD & MENU ERRORS (2000-2099) ==========
     FOOD_NOT_FOUND(2000, "Food item not found"),
@@ -86,7 +94,7 @@ public enum ErrorCode {
     MENU_INACTIVE(2005, "Menu is not active"),
     FOOD_PRICE_INVALID(2006, "Invalid food price"),
     FOOD_ALREADY_EXISTS(2007, "Food item already exists"),
-
+    MENU_ITEM_NOT_FOUND(2008, "Menu item not found"),
     // ========== ORDER ERRORS (2100-2199) ==========
     ORDER_NOT_FOUND(2100, "Order not found"),
     ORDER_ALREADY_CANCELLED(2101, "Order has already been cancelled"),
@@ -177,7 +185,7 @@ public enum ErrorCode {
     EXTERNAL_API_TIMEOUT(3102, "External API timeout"),
     INTEGRATION_CONFIGURATION_ERROR(3103, "Integration configuration error"),
     WEBHOOK_PROCESSING_FAILED(3104, "Webhook processing failed"),
-
+    GENERATE_QR_FAILED(3105, "Generate QR failed"),
     // ========== BUSINESS LOGIC ERRORS (3200-3299) ==========
     BUSINESS_RULE_VIOLATION(3200, "Business rule violation"),
     OPERATION_NOT_ALLOWED(3201, "Operation not allowed"),

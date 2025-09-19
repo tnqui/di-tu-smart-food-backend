@@ -1,6 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

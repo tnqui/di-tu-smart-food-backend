@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class TwoFASetupRequest {
-    private String email;
+    private String setUpToken;
+    private String otp;
 }

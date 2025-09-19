@@ -9,13 +9,22 @@ import com.nimbusds.jose.JOSEException;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.*;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
+import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
+import com.tranngocqui.ditusmartfoodbackend.mapper.UserMapper;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthenticationService;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.GoogleAuthenticatorService;
 import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
@@ -25,20 +34,21 @@ import java.util.Base64;
 
 @Slf4j
 @RestController
-@RequestMapping("admin/auth")
+@RequestMapping("/api/admin/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final GoogleAuthenticatorService googleAuthenticatorService;
-
+    private final UserMapper userMapper;
 
     /**
      * Bước 1: Đăng nhập với email/password
      * - Nếu không có 2FA: trả về access token
      * - Nếu có 2FA: trả về temp token và yêu cầu nhập mã 2FA
      */
+
     @PostMapping("/login")
     public ApiResponse<TokenResponse> authenticate(@RequestBody @Valid TokenRequest request) {
         TokenResponse result = authenticationService.token(request);
@@ -50,6 +60,7 @@ public class AuthenticationController {
     /**
      * Bước 2: Xác thực 2FA và nhận access token
      */
+
     @PostMapping("/verify-2fa")
     public ApiResponse<TokenResponse> verify2FA(@RequestBody @Valid TwoFALoginRequest request) {
         TokenResponse result = authenticationService.verify2FA(request);
@@ -84,9 +95,10 @@ public class AuthenticationController {
     /**
      * Đăng xuất
      */
+
+
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestBody LogoutRequest request) {
-        authenticationService.authenticate(request);
         return ApiResponse.<Void>builder()
                 .message("Đăng xuất thành công")
                 .build();
@@ -95,8 +107,9 @@ public class AuthenticationController {
     /**
      * Thiết lập 2FA - Bước 1: Tạo secret key và QR code
      */
+
     @PostMapping("/2fa/setup")
-    public ApiResponse<TwoFASetupResponse> setup2FA(@RequestBody TwoFASetupRequest request) {
+    public ApiResponse<TwoFASetupResponse> setup2FA(@RequestBody TokenRequest request) {
         User user = userService.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -126,7 +139,7 @@ public class AuthenticationController {
     @PostMapping("/2fa/confirm")
     public ApiResponse<Void> confirm2FA(@RequestBody @Valid TwoFAConfirmRequest request) {
         User user = userService.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (user.getTwoFactorSecret() == null) {
             return ApiResponse.<Void>builder()
@@ -186,6 +199,20 @@ public class AuthenticationController {
         }
     }
 
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMe(Authentication authentication) {
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails customUserDetails)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        User user = customUserDetails.getUser();
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userMapper.toUserResponse(user))
+                .build();
+    }
+
     /**
      * Tạo QR URL cho Google Authenticator
      */
@@ -210,4 +237,6 @@ public class AuthenticationController {
             throw new RuntimeException("Không thể sinh QR code", e);
         }
     }
+
+
 }

@@ -6,13 +6,15 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.Permis
 import com.tranngocqui.ditusmartfoodbackend.service.permission.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/permissions")
+@RequestMapping("/api/admin/permissions")
 @RequiredArgsConstructor
 public class PermissionController {
     private final PermissionService permissionService;
@@ -24,10 +26,17 @@ public class PermissionController {
                 .build();
     }
 
-    @GetMapping
+    @GetMapping("/all")
     ApiResponse<List<PermissionResponse>> getAll() {
         return ApiResponse.<List<PermissionResponse>>builder()
                 .result(permissionService.getAll())
+                .build();
+    }
+
+    @GetMapping
+    ApiResponse<Page<PermissionResponse>> getPermissionPagination(Pageable pageable) {
+        return ApiResponse.<Page<PermissionResponse>>builder()
+                .result(permissionService.getPermissionPagination(pageable))
                 .build();
     }
 

@@ -6,6 +6,8 @@ import com.tranngocqui.ditusmartfoodbackend.entity.Permission;
 import com.tranngocqui.ditusmartfoodbackend.mapper.PermissionMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.PermissionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +34,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void delete(String name) {
         permissionRepository.deleteById(name);
+    }
+
+    @Override
+    public Page<PermissionResponse> getPermissionPagination(Pageable pageable) {
+        return permissionMapper.toPermissionResponsePagination(permissionRepository.findAll(pageable));
     }
 
 

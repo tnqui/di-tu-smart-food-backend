@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DiTuSmartFoodBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DiTuSmartFoodBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DiTuSmartFoodBackendApplication.class, args);
+    }
 
 }

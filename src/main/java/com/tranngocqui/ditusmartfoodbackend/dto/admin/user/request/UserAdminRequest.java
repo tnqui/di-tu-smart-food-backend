@@ -19,12 +19,14 @@ public class UserAdminRequest {
     private String password;
     private Boolean isEmailVerified;
     private Boolean isPhoneVerified;
+    private boolean enabled;
     private Boolean accountStatus;
     private Integer loginAttempts;
     private LocalDateTime lastLoginAt;
     private String lastLoginIp;
     private String avatarUrl;
     private String language;
+    private Boolean twoFactorEnabled;
     private String timezone;
     private Set<String> roles;
 }

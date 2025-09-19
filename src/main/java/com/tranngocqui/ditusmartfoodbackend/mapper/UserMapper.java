@@ -7,8 +7,10 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequ
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import org.mapstruct.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -32,8 +34,10 @@ public interface UserMapper {
 
     UserProfileResponse toUserProfileResponse(User user);
 
-    RoleWithPermissionsResponse  toRoleWithPermissionsResponse(User user);
+    RoleWithPermissionsResponse toRoleWithPermissionsResponse(User user);
 
     List<UserResponse> toUserResponseList(List<User> users);
+
+    User toUser(CustomUserDetails customUserDetails);
 
 }

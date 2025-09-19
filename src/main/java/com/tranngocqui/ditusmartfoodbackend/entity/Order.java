@@ -1,5 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.tranngocqui.ditusmartfoodbackend.entity.OrderItem;
+import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,45 +10,36 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import java.util.Set;
 @Entity
 @Getter
 @Setter
 @Table(name = "orders")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", columnDefinition = "UUID")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "total_amount", precision = 10, scale = 2, nullable = false)
-    @NotNull
-    private BigDecimal totalAmount;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderItem> items;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 50)
     private OrderStatus status;
 
-    @Column(length = 1000)
-    private String note;
-
-    @Column(name = "delivery_address", length = 1000, nullable = false)
-    @NotNull
-    private String deliveryAddress;
-
-    @Column(name = "payment_method", length = 50)
+    private BigDecimal totalAmount;
+    private BigDecimal shippingFee;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String shippingAddress;
+    private String recipientName;
+    private String recipientPhone;
     private String paymentMethod;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_method_id")
+    private DeliveryMethod deliveryMethod;
 }

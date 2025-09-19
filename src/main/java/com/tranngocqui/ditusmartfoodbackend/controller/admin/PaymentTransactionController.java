@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/payment-transactions")
+@RequestMapping("/api/admin/payment-transactions")
 @CrossOrigin(origins = "*")
 public class PaymentTransactionController {
 }

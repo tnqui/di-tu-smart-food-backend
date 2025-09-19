@@ -5,30 +5,42 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
+import com.tranngocqui.ditusmartfoodbackend.enums.RoleConstants;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.*;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.Auth2FAResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.AuthRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.AuthResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
+import com.tranngocqui.ditusmartfoodbackend.enums.TokenType;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.mapper.AuthenticationMapper;
 import com.tranngocqui.ditusmartfoodbackend.mapper.UserMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
+import com.tranngocqui.ditusmartfoodbackend.service.jwt.JwtService;
+import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
+import com.tranngocqui.ditusmartfoodbackend.ultis.RoleChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Map;
-import java.util.StringJoiner;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,51 +48,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationMapper authenticationMapper;
     private final GoogleAuthenticatorService googleAuthenticatorService;
+    private final JwtService jwtService;
 
     @NonFinal
     @Value("${spring.security.jwt.secret}")
     protected String SIGNER_KEY;
 
-    // Lưu trữ temporary tokens cho 2FA
-    private final Map<String, String> tempTokenStore = new ConcurrentHashMap<>();
+    @NonFinal
+    @Value("${spring.security.jwt.issuer}")
+    private String ISSUER;
 
-    @Override
-    public TokenResponse token(TokenRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    @Value("${app.name}")
+    private String appName;
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+    @Value("${app.totp.algorithm}")
+    private String algorithm;
 
-        if (!authenticated) {
-            throw new AppException(ErrorCode.LOGIN_FAILED);
-        }
+    @Value("${app.totp.digits}")
+    private int digits;
 
-        if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
-            // Đã bật 2FA -> chỉ trả tempToken, chưa cấp token chính thức
-            String tempToken = generateTempToken(user);
-            return TokenResponse.builder()
-                    .tempToken(tempToken)
-                    .authenticated(false)
-                    .requires2FA(true)
-                    .message("Vui lòng nhập mã OTP để hoàn tất đăng nhập")
-                    .build();
-        } else {
-            // Chưa bật 2FA -> cấp token chính thức luôn
-            String tempToken = generateTempToken(user);
-            String secret = generateTwoFactorSecret(user); // sinh secret lưu DB
+    @Value("${app.totp.period}")
+    private int period;
 
-            return TokenResponse.builder()
-                    .tempToken(tempToken)
-                    .authenticated(false)
-                    .requires2FA(true)
-                    .message("Bạn cần bật 2FA để truy cập dashboard")
-                    .build();
-        }
-    }
+    private static final String TWO_FACTOR_URI = "otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=SHA1&digits=6&period=30";
 
 
 //    public TokenResponse token(TokenRequest request) {
@@ -121,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     public TokenResponse verify2FA(TwoFALoginRequest request) {
         // Xác thực temporary token
-        String email = validateTempToken(request.getTempToken());
+        String email = jwtService.validateTempToken(request.getTempToken());
 
         if (email == null) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
@@ -147,124 +142,284 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         // Xóa temp token
-        removeTempToken(request.getTempToken());
+        jwtService.removeTempToken(request.getTempToken());
 
         // Tạo token chính thức
-        String token = generateToken(user);
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
 
         return TokenResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .authenticated(true)
-                .requires2FA(false)
                 .message("Đăng nhập thành công")
                 .build();
     }
 
-    private String generateToken(User user) {
-        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
-
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
-                .issuer("ditufood.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
-                ))
-//                .claim("scope", buildScope(user))
-                .claim("userId", user.getId())
-                .claim("tokenType", "ACCESS")
-                .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(jwsHeader, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            log.error("Cannot create token", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Tạo temporary token cho 2FA (chỉ tồn tại 5 phút)
-     */
-    private String generateTempToken(User user) {
-        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
-
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
-                .issuer("ditufood.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(5, ChronoUnit.MINUTES).toEpochMilli()
-                ))
-                .claim("tokenType", "TEMP")
-                .claim("userId", user.getId())
-                .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(jwsHeader, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            String tempToken = jwsObject.serialize();
-
-            // Lưu temp token vào store
-            tempTokenStore.put(tempToken, user.getEmail());
-
-            return tempToken;
-        } catch (JOSEException e) {
-            log.error("Cannot create temp token", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Xác thực temporary token
-     */
-    private String validateTempToken(String tempToken) {
-        try {
-            if (!tempTokenStore.containsKey(tempToken)) {
-                return null;
-            }
-
-            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-            SignedJWT signedJWT = SignedJWT.parse(tempToken);
-
-            if (!signedJWT.verify(verifier)) {
-                tempTokenStore.remove(tempToken);
-                return null;
-            }
-
-            Date expiredTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-            String tokenType = signedJWT.getJWTClaimsSet().getStringClaim("tokenType");
-
-            if (expiredTime.before(new Date()) || !"TEMP".equals(tokenType)) {
-                tempTokenStore.remove(tempToken);
-                return null;
-            }
-
-            return signedJWT.getJWTClaimsSet().getSubject();
-
-        } catch (Exception e) {
-            log.error("Error validating temp token", e);
-            tempTokenStore.remove(tempToken);
-            return null;
-        }
-    }
-
-    /**
-     * Xóa temporary token
-     */
-    private void removeTempToken(String tempToken) {
-        tempTokenStore.remove(tempToken);
+    @Override
+    public boolean authenticate() {
+        return false;
     }
 
     @Override
-    public boolean authenticate(LogoutRequest logoutRequest) {
-        return false;
+    public AuthResponse clientLogin(AuthRequest authRequest) {
+        User user = userService.findByEmail(authRequest.getIdentifier())
+                .or(() -> userService.findByPhone(authRequest.getIdentifier()))
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));
+
+        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+
+        if (RoleChecker.hasAnyRole(roles, RoleConstants.MANAGEMENT_ROLES)) {
+            throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        if (!validatePassword(authRequest.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        AuthResponse response = new AuthResponse();
+        response.setAccessToken(jwtService.generateToken(user));
+        response.setRefreshToken(jwtService.generateRefreshToken(user));
+        return response;
+    }
+
+    @Override
+    public Auth2FAResponse dashboardLogin(AuthRequest authRequest) {
+
+        User user = userService.findByEmail(authRequest.getIdentifier())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));
+
+        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+
+        if (!RoleChecker.hasAnyRole(roles, RoleConstants.MANAGEMENT_ROLES)) {
+            throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        if (!validatePassword(authRequest.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        if (Boolean.TRUE.equals(user.getTwoFactorEnabled()) && user.getTwoFactorSecret() != null) {
+            String verify2FaToken = jwtService.generateTempTokenPreLogin2Fa(user);
+
+            return Auth2FAResponse.builder()
+                    .verify2FaToken(verify2FaToken)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Vui lòng nhập mã OTP để hoàn tất đăng nhập")
+                    .build();
+        } else {
+            String setup2FaToken = jwtService.generateTempTokenSetup2Fa(user);
+
+            return Auth2FAResponse.builder()
+                    .setup2FaToken(setup2FaToken)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Bạn cần bật 2FA để truy cập dashboard")
+                    .build();
+        }
+    }
+
+    public String generateSetupToken(String userId) {
+        try {
+            JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
+
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .subject(userId)
+                    .claim("tokenType", TokenType.TEMP.name())
+                    .issueTime(new Date())
+                    .expirationTime(Date.from(Instant.now().plus(5, ChronoUnit.MINUTES)))
+                    .build();
+
+            JWSObject jwsObject = new JWSObject(jwsHeader, new Payload(claimsSet.toJSONObject()));
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Cannot create setup token", e);
+        }
+    }
+
+    public JWTClaimsSet parseToken(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+            if (!signedJWT.verify(verifier)) {
+                throw new SecurityException("Invalid signature");
+            }
+
+            return signedJWT.getJWTClaimsSet();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid token", e);
+        }
+    }
+
+    @Override
+    public Auth2FAResponse setup2FA(String setup2FaToken) {
+
+        if (!jwtService.validateToken(setup2FaToken, TokenType.SETUP_2FA_TOKEN.name())) {
+            throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        UUID userId = jwtService.getUserIdFromJwt(setup2FaToken);
+
+        if (userId == null) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        String secret = generateTwoFactorSecret(user);
+
+        user.setTwoFactorSecret(secret);
+
+        user.setTwoFactorEnabled(false);
+
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        String qrCode = googleAuthenticatorService.generateQRCodeUrl(user.getEmail(), secret, appName);
+
+        return Auth2FAResponse.builder()
+                .qrAuthenticationSetup(qrCode)
+                .requires2FA(true)
+                .build();
+    }
+
+    @Override
+    public Auth2FAResponse confirm2FA(String twoFactorSetupToken, String code) {
+        if (!jwtService.validateToken(twoFactorSetupToken, TokenType.SETUP_2FA_TOKEN.name())) {
+
+            System.out.println(twoFactorSetupToken);
+
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        UUID userId = jwtService.getUserIdFromJwt(twoFactorSetupToken);
+        System.out.println("userId = " + userId);
+
+        if (userId == null) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getTwoFactorSecret() == null) {
+            throw new AppException(ErrorCode.TWO_FACTOR_REQUIRED);
+        }
+
+        int otp;
+
+        try {
+            otp = Integer.parseInt(code);
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.TWO_FACTOR_MISMATCH);
+        }
+
+        if (!googleAuthenticatorService.verifyCode(user.getTwoFactorSecret(), otp)) {
+            throw new AppException(ErrorCode.TWO_FACTOR_MISMATCH);
+        }
+
+        if (!user.getTwoFactorEnabled()) {
+            user.setTwoFactorEnabled(true);
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+        }
+
+        return Auth2FAResponse.builder()
+                .message("Successfully confirmed 2FA")
+                .build();
+    }
+
+    @Override
+    public Auth2FAResponse verify2FA(String preLoginToken, String otp) {
+
+        if (!jwtService.validateToken(preLoginToken, TokenType.PRE_LOGIN_TOKEN.name())) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        UUID userId = jwtService.getUserIdFromJwt(preLoginToken);
+
+        if (userId == null) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        int otpNumber;
+
+        try {
+            otpNumber = Integer.parseInt(otp);
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.TWO_FACTOR_MISMATCH);
+        }
+
+        if (!googleAuthenticatorService.verifyCode(user.getTwoFactorSecret(), otpNumber)) {
+            throw new AppException(ErrorCode.TWO_FACTOR_MISMATCH);
+        }
+
+
+        return Auth2FAResponse.builder()
+                .message("Successfully verified 2FA")
+                .authenticated(true)
+                .accessToken(jwtService.generateToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
+                .build();
+    }
+
+    @Override
+    public UserResponse getMe(Authentication authentication) {
+
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails customUserDetails)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        User user = customUserDetails.getUser();
+
+        return userMapper.toUserResponse(user);
+    }
+
+
+    @Override
+    public TokenResponse token(TokenRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+        if (!authenticated) {
+            throw new AppException(ErrorCode.LOGIN_FAILED);
+        }
+
+        if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
+            String tempToken = jwtService.generateTempToken(user);
+            return TokenResponse.builder()
+                    .tempToken(tempToken)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Vui lòng nhập mã OTP để hoàn tất đăng nhập")
+                    .build();
+        } else {
+            String tempToken = jwtService.generateTempToken(user);
+
+            String secret = generateTwoFactorSecret(user);
+
+            String qrCode = googleAuthenticatorService.generateQRCodeUrl(user.getEmail(), secret, appName);
+
+            return TokenResponse.builder()
+                    .tempToken(tempToken)
+                    .qrAuthenticationSetup(qrCode)
+                    .authenticated(false)
+                    .requires2FA(true)
+                    .message("Bạn cần bật 2FA để truy cập dashboard")
+                    .build();
+        }
     }
 
     @Override
@@ -311,11 +466,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public String generateTwoFactorSecret(User user) {
-        String secret = googleAuthenticatorService.generateSecretKey();
-        user.setTwoFactorSecret(secret);
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        return secret;
+        return googleAuthenticatorService.generateSecretKey();
     }
 
     @Override
@@ -341,36 +492,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
-
-    private String buildScope(User user) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_" + role.getName());
-                if (!CollectionUtils.isEmpty(role.getPermissions())) {
-                    role.getPermissions().forEach(permission -> {
-                        stringJoiner.add(permission.getName());
-                    });
-                }
-            });
-        }
-        return stringJoiner.toString();
-    }
-
-    /**
-     * Cleanup expired temp tokens (nên chạy định kỳ)
-     */
-    public void cleanupExpiredTempTokens() {
-        tempTokenStore.entrySet().removeIf(entry -> {
-            try {
-                SignedJWT signedJWT = SignedJWT.parse(entry.getKey());
-                Date expiredTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-                return expiredTime.before(new Date());
-            } catch (Exception e) {
-                return true; // Remove invalid tokens
-            }
-        });
     }
 }

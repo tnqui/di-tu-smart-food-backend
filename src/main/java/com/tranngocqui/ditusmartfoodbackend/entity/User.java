@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,7 +21,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String fullName;
+
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private String phone;
     private String password;
     private Boolean isEmailVerified;
@@ -38,29 +44,13 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Address> addresses;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Jwt> jwts = new ArrayList<>();
+
+
     @ManyToMany
     private Set<Role> roles;
-
-
-//
-//    public User() {
-//        this.isEmailVerified = false;
-//        this.isPhoneVerified = false;
-//        this.accountStatus = true;
-//        this.loginAttempts = 0;
-//        this.language = "vi";
-//        this.timezone = "Asia/Ho_Chi_Minh";
-//    }
-//
-//    @PrePersist
-//    protected void onCreate() {
-//        createdAt = LocalDateTime.now();
-//        updatedAt = LocalDateTime.now();
-//    }
-//
-//    @PreUpdate
-//    protected void onUpdate() {
-//        updatedAt = LocalDateTime.now();
-//    }
-
 }

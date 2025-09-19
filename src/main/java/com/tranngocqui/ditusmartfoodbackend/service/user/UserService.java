@@ -33,5 +33,14 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByPhone(String phone);
+
     User save(User user);
+
+    boolean existsById(UUID id);
+
+    Optional<User> findById(UUID id);
+
+    Optional<User> getUserProfileByEmailOrPhone(String email, String phone);
+
 }

@@ -119,11 +119,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getUsersPagination(Pageable pageable) {
-        Page<User> users = userRepository.findAll(pageable);
-
-        List<UserResponse> dtos = userMapper.toUserResponseList(users.getContent());
-
-        return new PageImpl<>(dtos, pageable, users.getTotalElements());
+        return userRepository.findAll(pageable)
+                .map(userMapper::toUserResponse);
     }
 
     @Override
@@ -132,8 +129,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> findByPhone(String phone) {
+        return userRepository.findByPhone(phone);
+    }
+
+    @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(id);
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> getUserProfileByEmailOrPhone(String email, String phone) {
+        return userRepository.findUserProfileByEmailOrPhone(email, phone);
     }
 
 //    @Override

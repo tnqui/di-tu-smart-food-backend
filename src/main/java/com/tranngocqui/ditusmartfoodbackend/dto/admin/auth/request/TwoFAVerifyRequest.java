@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class TwoFAVerifyRequest {
-    private String email;
-    private int code;
+    private String preLoginToken;
+    private String otp;
 }

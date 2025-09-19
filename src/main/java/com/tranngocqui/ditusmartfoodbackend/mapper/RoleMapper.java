@@ -2,11 +2,13 @@ package com.tranngocqui.ditusmartfoodbackend.mapper;
 
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request.RoleRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithoutPermissionsResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,4 +18,10 @@ public interface RoleMapper {
     Role toRole(RoleRequest request);
     RoleWithoutPermissionsResponse toRoleResponse(Role role);
     List<RoleWithoutPermissionsResponse> toRoleResponse(List<Role> roles);
+
+    RoleResponse toRoleResponsePage(Role role);
+
+    default Page<RoleResponse> toRoleResponse(Page<Role> roles){
+        return roles.map(this::toRoleResponsePage);
+    }
 }

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "order_items", uniqueConstraints = @UniqueConstraint(columnNames = { "order_id", "dish_id" }))
+@Table(name = "order_item", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "menu_item_id"}))
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,15 +21,15 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dish_id")
-    private Dish dish;
+    @JoinColumn(name = "menu_item_id")
+    private MenuItem menuItem;
 
-    @NotNull
-    @Column(nullable = false)
+    // @NotNull
+    // @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "price_at_order_time", precision = 10, scale = 2, nullable = false)
-    @NotNull
+    // @Column(name = "price_at_order_time", precision = 10, scale = 2, nullable = false)
+    // @NotNull
     private BigDecimal priceAtOrderTime;
 
 }

@@ -25,6 +25,7 @@ public class UserUpdateRequest {
     private String lastLoginIp;
     private String avatarUrl;
     private String language;
+    private Boolean twoFactorEnabled;
     private String timezone;
     private List<String> roles;
 }

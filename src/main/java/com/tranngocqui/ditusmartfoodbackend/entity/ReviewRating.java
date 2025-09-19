@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "review_ratings", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "dish_id" }))
+@Table(name = "review_ratings", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "menu_item_id" }))
 public class ReviewRating {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -24,8 +25,8 @@ public class ReviewRating {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dish_id")
-    private Dish dish;
+    @JoinColumn(name = "menu_item_id")
+    private MenuItem menuItem;
 
     @Min(value = 1, message = "Rating must be at least 1")
     @Max(value = 5, message = "Rating must be at most 5")
@@ -43,5 +44,4 @@ public class ReviewRating {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
 }
