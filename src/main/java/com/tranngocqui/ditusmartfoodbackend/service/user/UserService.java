@@ -39,7 +39,7 @@ public interface UserService {
 
     boolean existsById(UUID id);
 
-    Optional<User> findById(UUID id);
+    User findById(UUID id);
 
     Optional<User> getUserProfileByEmailOrPhone(String email, String phone);
 

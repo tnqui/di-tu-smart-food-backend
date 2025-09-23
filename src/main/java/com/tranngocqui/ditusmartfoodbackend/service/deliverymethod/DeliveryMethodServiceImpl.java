@@ -27,8 +27,8 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     }
 
     @Override
-    public DeliveryMethodAdminResponse update(String name, DeliveryMethodAdminRequest request) {
-        DeliveryMethod deliveryMethod = deliveryMethodRepository.findById(name).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
+    public DeliveryMethodAdminResponse update(Long id, DeliveryMethodAdminRequest request) {
+        DeliveryMethod deliveryMethod = deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
 
         deliveryMethodMapper.update(request, deliveryMethod);
 
@@ -36,12 +36,12 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         deliveryMethodRepository.deleteById(id);
     }
 
     @Override
-    public DeliveryMethodAdminResponse get(String id) {
+    public DeliveryMethodAdminResponse get(Long id) {
         return deliveryMethodMapper.toDeliveryMethodAdminResponse(deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND)));
     }
 
@@ -53,5 +53,10 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     @Override
     public Page<DeliveryMethodAdminResponse> getPagination(Pageable pageable) {
         return deliveryMethodMapper.toDeliveryMethodAdminResponsePage(deliveryMethodRepository.findAll(pageable));
+    }
+
+    @Override
+    public DeliveryMethod findById(Long id) {
+        return deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
     }
 }

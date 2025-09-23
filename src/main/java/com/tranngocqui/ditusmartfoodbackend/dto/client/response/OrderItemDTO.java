@@ -9,9 +9,15 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class OrderItemDTO {
-    private Long menuItem;
+
+    private Long menuItemId;
+
+    private String menuItemName;
+
     private String name;
+
     private int quantity;
-    private BigDecimal price;
-    private BigDecimal total;
+
+    private BigDecimal priceAtOrderTime;
+
 }

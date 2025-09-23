@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "order_item", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "menu_item_id"}))
+@Table(name = "order_items", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "menu_item_id"}))
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

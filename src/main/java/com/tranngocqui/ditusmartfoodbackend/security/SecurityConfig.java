@@ -27,6 +27,7 @@ public class SecurityConfig {
 
     protected static final String[] PUBLIC_ENDPOINTS = {
             "/test/**",
+            "/api/orders/**",
             "/api/test/**",
             "/api/auth/login",
             "/api/auth/dashboard-login",
@@ -86,18 +87,19 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        //
-                        .anyRequest().permitAll()
-                        ///
-//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/auth/verify-email").permitAll()
-//                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-//                        .requestMatchers("/api/users/**").hasAuthority("USER")
-//                        .anyRequest().authenticated()
+                                //
+//                                .anyRequest().permitAll()
+                                ///
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/auth/verify-email").permitAll()
+                                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                                .requestMatchers("/api/users/**").hasAuthority("USER")
+                                .anyRequest().authenticated()
                 )
                 .authenticationProvider(twoFactorAuthProvider)
                 .authenticationProvider(daoAuthenticationProvider())
+//                .addFilterBefore(maintenanceFilter, JwtAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {

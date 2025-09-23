@@ -6,6 +6,7 @@ import com.tranngocqui.ditusmartfoodbackend.dto.client.response.CreateOrderRespo
 import com.tranngocqui.ditusmartfoodbackend.entity.Order;
 import com.tranngocqui.ditusmartfoodbackend.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +25,11 @@ public class OrderClientController {
                 .result(orderService.create(request))
                 .build();
     }
+
+//    @PostMapping("/order")
+//    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
+//        return ResponseEntity.ok(orderService.order(createOrderRequest));
+//    }
+
 
 }

@@ -106,6 +106,8 @@ public enum ErrorCode {
     ORDER_TIME_EXPIRED(2107, "Order time has expired"),
     DELIVERY_ADDRESS_REQUIRED(2108, "Delivery address is required"),
     INVALID_DELIVERY_TIME(2109, "Invalid delivery time"),
+    ORDER_FORBIDDEN(2110, "You are not allowed to access this order"),
+    ORDER_DOES_NOT_EXIST(2111,"Order does not exist"),
 
     // ========== PAYMENT ERRORS (2200-2299) ==========
     PAYMENT_FAILED(2200, "Payment processing failed"),

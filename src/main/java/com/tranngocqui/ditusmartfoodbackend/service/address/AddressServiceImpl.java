@@ -26,7 +26,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressAdminResponse create(AddressAdminRequest request) {
-        User user = userService.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.findById(request.getUserId());
 
         Address address = addressMapper.toAddress(request);
 
@@ -62,8 +62,7 @@ public class AddressServiceImpl implements AddressService {
         addressMapper.update(request, address);
 
         if (request.getUserId() != null) {
-            User user = userService.findById(request.getUserId())
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            User user = userService.findById(request.getUserId());
             address.setUser(user);
         }
 

@@ -4,6 +4,8 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.menuitem.MenuItemAdminRequ
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.menuitem.MenuItemAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.response.MenuItemClientResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.MenuItem;
+import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.MenuItemMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.CategoryRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.MenuItemRepository;
@@ -65,5 +67,11 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public Page<MenuItemAdminResponse> getMenuItemsPagination(Pageable pageable) {
         return menuItemMapper.toMenuItemAdminResponsePage(menuItemRepository.findAll(pageable));
+    }
+
+    @Override
+    public MenuItem findById(Long id) {
+        return menuItemRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
+
     }
 }

@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,6 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String fullName;
 
@@ -50,7 +50,13 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Jwt> jwts = new ArrayList<>();
 
-
     @ManyToMany
     private Set<Role> roles;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
+    }
 }

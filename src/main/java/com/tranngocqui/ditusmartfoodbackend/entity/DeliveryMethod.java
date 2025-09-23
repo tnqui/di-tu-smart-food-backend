@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -15,7 +17,7 @@ public class DeliveryMethod {
     private String name;
     private String description;
     private Integer time;
-    private Double price;
+    private BigDecimal price;
 
 }
 

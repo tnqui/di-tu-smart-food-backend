@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByPhone(String phone);
 
 
-    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
+    //    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
     @NonNull
     Optional<User> findById(@NonNull UUID id);
 
@@ -39,4 +39,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @EntityGraph(attributePaths = {"roles", "roles.permissions", "addresses"})
     Optional<User> findByEmailOrPhone(String email, String phone);
 
+    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
+    User findWithRoleAndPermissionById(UUID id);
 }

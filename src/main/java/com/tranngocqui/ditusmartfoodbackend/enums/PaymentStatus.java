@@ -1,5 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.enums;
 
 public enum PaymentStatus {
-    PENDING, SUCCESS, FAILED
+    PENDING,
+    SUCCESS,
+    FAILED,
+    CANCELLED,
+    EXPIRED,
+    REFUNDED
 }

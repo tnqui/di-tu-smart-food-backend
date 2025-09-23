@@ -25,9 +25,9 @@ public class DeliveryMethodAdminController {
     }
 
     @PatchMapping("{name}")
-    ApiResponse<DeliveryMethodAdminResponse> update(@PathVariable String name, @RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
+    ApiResponse<DeliveryMethodAdminResponse> update(@PathVariable Long id, @RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
         return ApiResponse.<DeliveryMethodAdminResponse>builder()
-                .result(deliveryMethodService.update(name, deliveryMethodAdminRequest))
+                .result(deliveryMethodService.update(id, deliveryMethodAdminRequest))
                 .build();
     }
 
@@ -46,14 +46,14 @@ public class DeliveryMethodAdminController {
     }
 
     @GetMapping("{name}")
-    ApiResponse<DeliveryMethodAdminResponse> get(@PathVariable String name) {
+    ApiResponse<DeliveryMethodAdminResponse> get(@PathVariable Long id) {
         return ApiResponse.<DeliveryMethodAdminResponse>builder()
-                .result(deliveryMethodService.get(name))
+                .result(deliveryMethodService.get(id))
                 .build();
     }
 
     @DeleteMapping("{id}")
-    void delete(@PathVariable String id) {
+    void delete(@PathVariable Long id) {
         deliveryMethodService.delete(id);
     }
 }

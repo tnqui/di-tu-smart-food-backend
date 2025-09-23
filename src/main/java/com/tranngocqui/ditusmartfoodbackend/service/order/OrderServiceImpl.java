@@ -1,75 +1,109 @@
 package com.tranngocqui.ditusmartfoodbackend.service.order;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.client.request.CreateOrderRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.client.request.OrderItemRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.response.CreateOrderResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.MenuItem;
-import com.tranngocqui.ditusmartfoodbackend.entity.Order;
-import com.tranngocqui.ditusmartfoodbackend.entity.OrderItem;
-import com.tranngocqui.ditusmartfoodbackend.entity.User;
+import com.tranngocqui.ditusmartfoodbackend.entity.*;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.OrderMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.MenuItemRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.OrderRepository;
-import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
+import com.tranngocqui.ditusmartfoodbackend.repository.PaymentMethodRepository;
+import com.tranngocqui.ditusmartfoodbackend.service.deliverymethod.DeliveryMethodService;
+import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final DeliveryMethodService deliveryMethodService;
+    private final PaymentMethodRepository paymentMethodRepository;
     private final MenuItemRepository menuItemRepository;
 
     @Override
     public CreateOrderResponse create(CreateOrderRequest request) {
+        DeliveryMethod deliveryMethod = deliveryMethodService.findById(request.getDeliveryMethodId());
+
         Order order = orderMapper.toOrder(request);
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        order.setDeliveryMethod(deliveryMethod);
+
+        User user = userService.findById(UUID.fromString(request.getUserId()));
+
         order.setUser(user);
 
-        order.setItems(new HashSet<>());
+        List<OrderItem> items = request.getItems().stream()
+                .map(itemRequest -> {
+                    MenuItem menuItem = menuItemRepository.findById(itemRequest.getMenuItemId()).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrder(order);
+                    orderItem.setMenuItem(menuItem);
+                    orderItem.setQuantity(itemRequest.getQuantity());
+                    orderItem.setPriceAtOrderTime(menuItem.getPrice());
 
-        for (OrderItemRequest itemRequest : request.getItems()) {
-            MenuItem menuItem = menuItemRepository.findById(itemRequest.getMenuItemId())
-                    .orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
+                    return orderItem;
+                })
+                .toList();
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setMenuItem(menuItem);
-            orderItem.setQuantity(itemRequest.getQuantity());
+        order.setItems(items);
 
-            BigDecimal price = itemRequest.getPriceAtOrderTime();
-            orderItem.setPriceAtOrderTime(price != null ? price : menuItem.getPrice());
+        order.setDeliveryMethod(deliveryMethodService.findById(request.getDeliveryMethodId()));
 
-            orderItem.setOrder(order);
+        order.setShippingFee(order.getDeliveryMethod().getPrice());
 
-            order.getItems().add(orderItem);
+        BigDecimal totalAmount = request.getItems().stream()
+                .map(itemRequest -> {
+                    MenuItem menuItem = menuItemRepository.findById(itemRequest.getMenuItemId()).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
-            BigDecimal itemTotal = orderItem.getPriceAtOrderTime().multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+                    BigDecimal price = menuItem.getPrice();
+                    int quantity = itemRequest.getQuantity();
 
-            totalAmount = totalAmount.add(itemTotal);
-        }
+                    return price.multiply(BigDecimal.valueOf(quantity));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(order.getShippingFee() == null ? BigDecimal.ZERO : order.getShippingFee());
 
-        order.setCreatedAt(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
-        order.setShippingFee(BigDecimal.ZERO);
-        order.setShippingAddress(null);
+        order.setTotalAmount(totalAmount);
 
-        BigDecimal finalTotal = totalAmount.add(order.getShippingFee());
-
-        order.setTotalAmount(finalTotal);
+        order.setPaymentMethod(paymentMethodRepository.findById(request.getPaymentMethodId()).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED)));
 
         return orderMapper.toCreateOrderResponse(orderRepository.save(order));
+    }
+
+    @Override
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Order findById(UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    }
+
+    @Override
+    public Order order(CreateOrderRequest request) {
+        Order order = orderMapper.toOrder(request);
+
+        order.setUser(userService.findById(UUID.fromString(request.getUserId())));
+
+        order.setDeliveryMethod(deliveryMethodService.findById(request.getDeliveryMethodId()));
+
+        order.setShippingFee(order.getDeliveryMethod().getPrice());
+
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public void processAfterPayment(Order order) {
+
     }
 }

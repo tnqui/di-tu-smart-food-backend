@@ -170,7 +170,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
-        if (RoleChecker.hasAnyRole(roles, RoleConstants.MANAGEMENT_ROLES)) {
+        if (RoleChecker.hasAnyRole(roles, RoleConstants.STAFF_ROLES)) {
             throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
@@ -192,7 +192,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
-        if (!RoleChecker.hasAnyRole(roles, RoleConstants.MANAGEMENT_ROLES)) {
+        if (!RoleChecker.hasAnyRole(roles, RoleConstants.STAFF_ROLES)) {
             throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
@@ -269,8 +269,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.findById(userId);
 
         String secret = generateTwoFactorSecret(user);
 
@@ -306,8 +305,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.findById(userId);
 
         if (user.getTwoFactorSecret() == null) {
             throw new AppException(ErrorCode.TWO_FACTOR_REQUIRED);
@@ -349,8 +347,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findWithRoleAndPermissionById((userId));
 
         int otpNumber;
 

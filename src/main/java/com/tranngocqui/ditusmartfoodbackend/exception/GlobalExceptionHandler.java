@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -69,23 +70,27 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(value = AppException.class)
-    ResponseEntity<ApiResponse> handleAppException(AppException ex) {
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiResponse> handleAppException(AppException ex) {
+
+        HttpStatus status = (ex.getErrorCode() == ErrorCode.UNAUTHORIZED)
+                ? HttpStatus.UNAUTHORIZED
+                : HttpStatus.BAD_REQUEST;
 
         ErrorCode errorCode = ex.getErrorCode();
 
         ApiResponse apiResponse = new ApiResponse();
 
         apiResponse.setCode(errorCode.getCode());
-
         apiResponse.setMessage(errorCode.getMessage());
 
         if (debugMode) {
             logger.error("Exception caught", ex);
         }
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.status(status).body(apiResponse);
     }
+
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -151,4 +156,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body(apiResponse);
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    ResponseEntity<ApiResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
+        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
 }
