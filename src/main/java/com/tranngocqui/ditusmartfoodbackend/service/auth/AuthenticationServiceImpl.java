@@ -66,54 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${app.name}")
     private String appName;
 
-    @Value("${app.totp.algorithm}")
-    private String algorithm;
 
-    @Value("${app.totp.digits}")
-    private int digits;
-
-    @Value("${app.totp.period}")
-    private int period;
-
-    private static final String TWO_FACTOR_URI = "otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=SHA1&digits=6&period=30";
-
-
-//    public TokenResponse token(TokenRequest request) {
-//        User user = userRepository.findUserProfileByEmailOrPhone(request.getEmail(), request.getPhone())
-//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-//
-//        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
-//
-//        if (!authenticated) {
-//            throw new AppException(ErrorCode.LOGIN_FAILED);
-//        }
-//
-//        // Kiểm tra xem user có bật 2FA không
-//        if (user.getTwoFactorEnabled()) {
-//            // Tạo temporary token thay vì token chính thức
-//            String tempToken = generateTempToken(user);
-//
-//            return TokenResponse.builder()
-//                    .tempToken(tempToken)
-//                    .authenticated(false)
-//                    .requires2FA(true)
-//                    .message("Vui lòng nhập mã 2FA để hoàn tất đăng nhập")
-//                    .build();
-//        } else {
-//            // Không có 2FA, tạo token bình thường
-//            String token = generateToken(user);
-//
-//            return TokenResponse.builder()
-//                    .token(token)
-//                    .authenticated(true)
-//                    .requires2FA(false)
-//                    .build();
-//        }
-//    }
-
-    /**
-     * Xác thực 2FA và tạo token chính thức
-     */
     public TokenResponse verify2FA(TwoFALoginRequest request) {
         // Xác thực temporary token
         String email = jwtService.validateTempToken(request.getTempToken());

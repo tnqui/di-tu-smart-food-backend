@@ -1,7 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentStatus;
+import com.tranngocqui.ditusmartfoodbackend.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -15,7 +17,6 @@ import java.util.UUID;
 @Table(name = "payment_transactions")
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -25,9 +26,8 @@ public class PaymentTransaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    @ToString.Exclude
     private Order order;
-
+    
     @Enumerated(EnumType.STRING)
     private PaymentProvider provider;
 
@@ -37,10 +37,12 @@ public class PaymentTransaction {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
+    private TransactionStatus status;
 
     private LocalDateTime createdAt;
+
     private LocalDateTime paidAt;
+
     private LocalDateTime expiredAt;
 
     @Column(columnDefinition = "TEXT")
@@ -51,13 +53,13 @@ public class PaymentTransaction {
     @PrePersist
     public void prePersist() {
         if (id == null) {
-            id = UUID.randomUUID();
+            id = Generators.timeBasedEpochRandomGenerator().generate();
         }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
         if (status == null) {
-            status = PaymentStatus.PENDING;
+            status = TransactionStatus.PENDING;
         }
     }
 

@@ -1,29 +1,22 @@
-package com.tranngocqui.ditusmartfoodbackend.service.payment;
+package com.tranngocqui.ditusmartfoodbackend.service.paymenttransaction.zalopay;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Order;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import com.tranngocqui.ditusmartfoodbackend.properties.ZaloPayProperties;
+import com.tranngocqui.ditusmartfoodbackend.service.paymenttransaction.factory.PaymentStrategy;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class ZaloPatStrategy implements PaymentStrategy {
+public class ZaloPayStrategy implements PaymentStrategy {
 
     private final ZaloPayProperties zaloPayProperties;
 

@@ -2,27 +2,16 @@ package com.tranngocqui.ditusmartfoodbackend.service.paymentMethod;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.paymentmethod.PaymentMethodRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.response.PaymentMethodResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
-import com.tranngocqui.ditusmartfoodbackend.entity.Order;
 import com.tranngocqui.ditusmartfoodbackend.entity.PaymentMethod;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
-import com.tranngocqui.ditusmartfoodbackend.exception.UnsupportedPaymentException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.PaymentMethodMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.OrderRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.PaymentMethodRepository;
-import com.tranngocqui.ditusmartfoodbackend.service.payment.PaymentServiceFactory;
-import com.tranngocqui.ditusmartfoodbackend.service.payment.PaymentStrategy;
+import com.tranngocqui.ditusmartfoodbackend.service.paymenttransaction.factory.PaymentServiceFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Slf4j
 @Service

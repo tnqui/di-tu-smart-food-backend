@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.service.payment;
+package com.tranngocqui.ditusmartfoodbackend.service.paymenttransaction.factory;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import org.springframework.stereotype.Service;

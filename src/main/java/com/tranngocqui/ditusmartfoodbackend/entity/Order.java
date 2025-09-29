@@ -47,6 +47,10 @@ public class Order {
 
     private String shippingAddress;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private String recipientName;
 
     private String recipientPhone;
@@ -57,12 +61,10 @@ public class Order {
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<PaymentTransaction> transactions;
 
-    @OneToOne
-    @JoinColumn(name = "successful_transaction_id")
-    private PaymentTransaction successfulTransaction;
+    private UUID successfulTransactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_method_id")
@@ -75,7 +77,9 @@ public class Order {
         }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.status = OrderStatus.PENDING;
+        if (this.status == null) {
+            this.status = OrderStatus.PENDING;
+        }
     }
 
     @PreUpdate

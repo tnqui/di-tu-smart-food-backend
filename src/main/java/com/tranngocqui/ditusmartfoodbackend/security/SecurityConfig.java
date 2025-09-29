@@ -27,6 +27,7 @@ public class SecurityConfig {
 
     protected static final String[] PUBLIC_ENDPOINTS = {
             "/test/**",
+            "/api/payment/momo/**",
             "/api/orders/**",
             "/api/test/**",
             "/api/auth/login",
@@ -56,7 +57,6 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**"
     };
-
 
     private final CustomUserDetailsService customUserDetailsService;
     private final TwoFactorAuthenticationProvider twoFactorAuthProvider;

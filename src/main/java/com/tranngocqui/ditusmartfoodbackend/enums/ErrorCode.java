@@ -120,6 +120,7 @@ public enum ErrorCode {
     REFUND_NOT_ALLOWED(2207, "Refund not allowed for this transaction"),
     CARD_EXPIRED(2208, "Credit card has expired"),
     CARD_DECLINED(2209, "Credit card was declined"),
+    PAYMENT_TRANSACTION_NOT_FOUND(2210, "Payment transaction not found"),
 
     // ========== INVENTORY ERRORS (2300-2399) ==========
     INGREDIENT_NOT_FOUND(2300, "Ingredient not found"),
