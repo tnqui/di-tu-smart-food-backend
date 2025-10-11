@@ -8,11 +8,11 @@ import org.springframework.data.domain.Pageable;
 public interface AddressService {
     AddressAdminResponse create(AddressAdminRequest request);
 
-    AddressAdminResponse update(Long id, AddressAdminRequest request);
+    AddressAdminResponse update(String id, AddressAdminRequest request);
 
-    void delete(Long id);
+    void delete(String id);
 
-    AddressAdminResponse get(Long id);
+    AddressAdminResponse get(String id);
 
     Page<AddressAdminResponse> getPagination(Pageable pageable);
 }

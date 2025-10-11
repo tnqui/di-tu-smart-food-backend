@@ -1,8 +1,12 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -12,11 +16,17 @@ import lombok.*;
 @Setter
 public class PaymentMethod {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
     private PaymentProvider name;
 
     private String description;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
+    }
 }

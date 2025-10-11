@@ -11,15 +11,15 @@ import java.util.List;
 public interface DeliveryMethodService {
     DeliveryMethodAdminResponse create(DeliveryMethodAdminRequest request);
 
-    DeliveryMethodAdminResponse update(Long id, DeliveryMethodAdminRequest request);
+    DeliveryMethodAdminResponse update(String id, DeliveryMethodAdminRequest request);
 
-    void delete(Long id);
+    void delete(String id);
 
-    DeliveryMethodAdminResponse get(Long id);
+    DeliveryMethodAdminResponse get(String id);
 
     List<DeliveryMethodAdminResponse> getAll();
 
     Page<DeliveryMethodAdminResponse> getPagination(Pageable pageable);
 
-    DeliveryMethod findById(Long id);
+    DeliveryMethod findById(String id);
 }

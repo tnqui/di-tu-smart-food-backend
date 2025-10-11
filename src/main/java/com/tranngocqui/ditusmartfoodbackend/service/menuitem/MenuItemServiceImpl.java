@@ -9,12 +9,14 @@ import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.MenuItemMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.CategoryRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.MenuItemRepository;
+import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     public MenuItemAdminResponse create(MenuItemAdminRequest menuItemRequest) {
         MenuItem menuItem = menuItemMapper.toMenuItem(menuItemRequest);
 
-        var listValidCategory = categoryRepository.findAllById(menuItemRequest.getCategories());
+        var listValidCategory = categoryRepository.findAllById(UUIDUtils.fromSetString(menuItemRequest.getCategories()));
         menuItem.setCategories(new HashSet<>(listValidCategory));
 
         return menuItemMapper.toMenuItemAdminResponse(menuItemRepository.save(menuItem));
@@ -70,8 +72,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public MenuItem findById(Long id) {
-        return menuItemRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
+    public MenuItem findById(String id) {
+        return menuItemRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
     }
 }

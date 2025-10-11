@@ -18,5 +18,5 @@ public interface MenuItemService {
 
     Page<MenuItemAdminResponse> getMenuItemsPagination(Pageable pageable);
 
-    MenuItem findById(Long id);
+    MenuItem findById(String id);
 }

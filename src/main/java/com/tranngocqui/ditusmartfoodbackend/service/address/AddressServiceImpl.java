@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
@@ -53,9 +55,9 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressAdminResponse update(Long id, AddressAdminRequest request) {
+    public AddressAdminResponse update(String id, AddressAdminRequest request) {
 
-        Address address = addressRepository.findById(id)
+        Address address = addressRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
 
         // Cập nhật các field từ request vào address
@@ -73,13 +75,13 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public void delete(Long id) {
-        addressRepository.deleteById(id);
+    public void delete(String id) {
+        addressRepository.deleteById(UUID.fromString(id));
     }
 
     @Override
-    public AddressAdminResponse get(Long id) {
-        Address address = addressRepository.findById(id)
+    public AddressAdminResponse get(String id) {
+        Address address = addressRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
 
         return addressMapper.toAddressAdminResponse(address);

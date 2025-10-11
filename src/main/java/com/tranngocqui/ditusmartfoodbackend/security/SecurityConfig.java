@@ -1,11 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.security;
 
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,9 +18,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.List;
 
 @Configuration
@@ -63,6 +69,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final PasswordEncoder passwordEncoder;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public AuthenticationManager authenticationManager() {
@@ -88,30 +96,22 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                                 //
-//                                .anyRequest().permitAll()
-                                ///
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/auth/verify-email").permitAll()
-                                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers("/api/users/**").hasAuthority("USER")
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
+                        ///
+//                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/api/auth/verify-email").permitAll()
+//                                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+//                                .requestMatchers("/api/users/**").hasAuthority("USER")
+//                                .anyRequest().authenticated()
                 )
                 .authenticationProvider(twoFactorAuthProvider)
                 .authenticationProvider(daoAuthenticationProvider())
 //                .addFilterBefore(maintenanceFilter, JwtAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\":\"Access Denied\"}");
-                        })
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 );
 
         return http.build();

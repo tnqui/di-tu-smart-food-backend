@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
 import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -15,8 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "notifications")
 public class Notification {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", columnDefinition = "UUID")
@@ -49,6 +50,9 @@ public class Notification {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
         this.createdAt = LocalDateTime.now();
         if (this.type == null) {
             this.type = NotificationType.ORDER;

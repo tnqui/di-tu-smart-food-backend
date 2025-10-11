@@ -1,11 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,8 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "order_items", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "menu_item_id"}))
 public class OrderItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -32,4 +34,10 @@ public class OrderItem {
     // @NotNull
     private BigDecimal priceAtOrderTime;
 
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
+    }
 }

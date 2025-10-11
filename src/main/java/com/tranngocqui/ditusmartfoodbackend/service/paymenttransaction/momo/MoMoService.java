@@ -40,7 +40,7 @@ public class MoMoService {
             @Value("${momo.callback-url}") String callbackUrl,
             @Value("${momo.redirect-url}") String redirectUrl,
             @Value("${momo.request-type}") String requestType,
-            @Value("${momo.momo-url}") String momoUrl,
+            @Value("${momo.endpoint}") String momoUrl,
             OrderService orderService) {
         this.partnerCode = partnerCode;
         this.accessKey = accessKey;

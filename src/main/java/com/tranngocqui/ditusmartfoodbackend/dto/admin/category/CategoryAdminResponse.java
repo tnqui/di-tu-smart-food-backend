@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class CategoryAdminResponse {
-    private Long id;
+    private String id;
     private String name;
     private String description;
     private String imageUrl;

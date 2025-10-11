@@ -2,11 +2,14 @@ package com.tranngocqui.ditusmartfoodbackend.exception;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,9 +27,7 @@ public class GlobalExceptionHandler {
     @Value("${app.debug:false}")
     private boolean debugMode;
 
-
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Object> handleApiException(ApiException ex) {
@@ -47,6 +48,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse> handleRuntimeException(Exception ex) {
 
         ApiResponse apiResponse = new ApiResponse();
+
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
 
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
@@ -69,6 +71,22 @@ public class GlobalExceptionHandler {
                 .body("Có lỗi xảy ra: dữ liệu không tồn tại");
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex
+            , HttpServletRequest request) {
+
+        if (debugMode) {
+            logger.error("Exception caught", ex);
+        }
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(ErrorCode.REQUIRED_FIELD_MISSING.getCode())
+                .message(ErrorCode.REQUIRED_FIELD_MISSING.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiResponse> handleAppException(AppException ex) {
@@ -115,6 +133,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     ResponseEntity<ApiResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {

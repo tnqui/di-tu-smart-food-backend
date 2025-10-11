@@ -2,6 +2,7 @@ package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request.RoleRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithoutPermissionsResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.role.RoleService;
@@ -15,46 +16,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/roles")
 @RequiredArgsConstructor
-public class RoleController {
+public class RoleAdminController {
     private final RoleService roleService;
 
     @GetMapping("/all")
-    ApiResponse<List<RoleWithoutPermissionsResponse>> getAll() {
-        return ApiResponse.<List<RoleWithoutPermissionsResponse>>builder()
+    ApiResponse<List<RoleAdminResponse>> getAll() {
+        return ApiResponse.<List<RoleAdminResponse>>builder()
                 .result(roleService.getAll())
                 .build();
     }
 
     @GetMapping
-    ApiResponse<Page<RoleResponse>> getRolePagination(Pageable pageable) {
-        return ApiResponse.<Page<RoleResponse>>builder()
+    ApiResponse<Page<RoleAdminResponse>> getRolePagination(Pageable pageable) {
+        return ApiResponse.<Page<RoleAdminResponse>>builder()
                 .result(roleService.getRolePagination(pageable))
                 .build();
     }
 
-    //    @PostMapping
-//    ApiResponse<RoleWithoutPermissionsResponse> create(@RequestBody RoleRequest roleRequest) {
-//        return ApiResponse.<RoleWithoutPermissionsResponse>builder()
-//                .result(roleService.create(roleRequest))
-//                .build();
-//    }
     @PostMapping
-    RoleWithoutPermissionsResponse create(@RequestBody RoleRequest roleRequest) {
-        return roleService.create(roleRequest);
-//
+    RoleAdminResponse create(@RequestBody RoleRequest request) {
+        return roleService.create(request);
     }
 
-
     @PutMapping
-    ApiResponse<RoleWithoutPermissionsResponse> update(@RequestBody RoleRequest roleRequest) {
-        return ApiResponse.<RoleWithoutPermissionsResponse>builder()
-                .result(roleService.update(roleRequest))
+    ApiResponse<RoleAdminResponse> update(@RequestBody RoleRequest request) {
+        return ApiResponse.<RoleAdminResponse>builder()
+                .result(roleService.update(request))
                 .build();
     }
 
     @DeleteMapping
-    ApiResponse<Void> delete(@RequestBody String role) {
-        roleService.delete(role);
+    ApiResponse<Void> delete(@RequestBody String id) {
+        roleService.delete(id);
         return ApiResponse.<Void>builder()
                 .build();
     }

@@ -1,44 +1,44 @@
 package com.tranngocqui.ditusmartfoodbackend.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
-import com.tranngocqui.ditusmartfoodbackend.service.jwt.JwtServiceImpl;
+import com.tranngocqui.ditusmartfoodbackend.service.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import reactor.util.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtDecoder jwtDecoder;
 
+    private final JwtDecoder jwtDecoder;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String requestPath = request.getRequestURI();
@@ -55,7 +55,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Jwt jwt = jwtDecoder.decode(token);
 
                 if (!jwtService.validateAccessToken(token)) {
-                    throw new AppException(ErrorCode.INVALID_TOKEN);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    new ObjectMapper().writeValue(response.getOutputStream(),
+                            new ApiResponse<>(ErrorCode.UNAUTHENTICATED.getCode(), ErrorCode.UNAUTHENTICATED.getMessage()));
+                    return;
                 }
 
                 String username = jwt.getSubject();
@@ -70,9 +74,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
+//            } catch (ExpiredJwtException ex) {
+//
+//            } catch () {
+//
+//            } catch () {
+//
+//            } catch () {
+
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
-                throw new AppException(ErrorCode.INVALID_TOKEN);
+                handleException(response, HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.getReasonPhrase(), e.getMessage());
+                return;
             }
         }
         filterChain.doFilter(request, response);
@@ -83,6 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
     }
 
+
     private String extractTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -91,20 +105,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
-        try {
-            String scope = jwt.getClaimAsString("scope");
+    private void handleException(HttpServletResponse response,
+                                 HttpStatus status,
+                                 String message,
+                                 String detail) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(status.value());
+        ApiResponse<AppException> apiResponse = ApiResponse.<AppException>builder()
+                .code(status.value())
+                .message(message)
+                .build();
 
-            if (scope != null && !scope.trim().isEmpty()) {
-                return Arrays.stream(scope.split(" "))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            logger.debug("Failed to extract authorities from JWT scope: " + e.getMessage());
-        }
+        log.warn(detail);
 
-        return Collections.emptyList();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        response.getWriter().write(mapper.writeValueAsString(apiResponse));
     }
+
+//    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
+//        try {
+//            String scope = jwt.getClaimAsString("scope");
+//
+//            if (scope != null && !scope.trim().isEmpty()) {
+//                return Arrays.stream(scope.split(" "))
+//                        .map(SimpleGrantedAuthority::new)
+//                        .collect(Collectors.toList());
+//            }
+//        } catch (Exception e) {
+//            logger.debug("Failed to extract authorities from JWT scope: " + e.getMessage());
+//        }
+//
+//        return Collections.emptyList();
+//    }
 
 }

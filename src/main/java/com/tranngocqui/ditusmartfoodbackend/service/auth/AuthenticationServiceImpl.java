@@ -344,7 +344,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated) {
-            throw new AppException(ErrorCode.LOGIN_FAILED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {

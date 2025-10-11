@@ -5,6 +5,8 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.RegisterReque
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithPermissionsResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
@@ -22,9 +24,6 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 
-    //    User toUser(UserCreateRequest request);
-    User toUser(TokenRequest request);
-
     @Mapping(target = "roles", ignore = true)
     User toUser(UserAdminRequest request);
 
@@ -32,12 +31,11 @@ public interface UserMapper {
 
     UserResponse toUserResponse(User user);
 
-    UserProfileResponse toUserProfileResponse(User user);
+    UserAdminResponse toUserAdminResponse(User user);
 
-    RoleWithPermissionsResponse toRoleWithPermissionsResponse(User user);
+    UserAdminProfileResponse toUserAdminProfileResponse(User user);
 
-    List<UserResponse> toUserResponseList(List<User> users);
+    List<UserAdminResponse> toUserResponseList(List<User> users);
 
-    User toUser(CustomUserDetails customUserDetails);
 
 }

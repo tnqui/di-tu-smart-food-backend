@@ -9,8 +9,7 @@ import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import java.util.UUID;
 
 public interface PaymentMethodService {
-    PaymentMethod findById(Long id);
+    PaymentMethod findById(String id);
 
     PaymentMethodResponse create(PaymentMethodRequest request);
-
 }

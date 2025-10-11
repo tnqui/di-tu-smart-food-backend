@@ -3,6 +3,7 @@ package com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request;
 import lombok.*;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor

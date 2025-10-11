@@ -16,7 +16,7 @@ public class CreateOrderRequest {
 
     private List<OrderItemRequest> items;
 
-    private Long deliveryMethodId;
+    private String deliveryMethodId;
 
     private String shippingAddress;
 
@@ -24,6 +24,6 @@ public class CreateOrderRequest {
 
     private String recipientPhone;
 
-    private Long paymentMethodId;
+    private String paymentMethodId;
 
 }

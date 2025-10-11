@@ -6,6 +6,7 @@ import com.tranngocqui.ditusmartfoodbackend.entity.*;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.OrderMapper;
+import com.tranngocqui.ditusmartfoodbackend.repository.DeliveryMethodRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.MenuItemRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.OrderRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.PaymentMethodRepository;
@@ -24,13 +25,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final UserService userService;
-    private final DeliveryMethodService deliveryMethodService;
+    private final DeliveryMethodRepository deliveryMethodRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final MenuItemRepository menuItemRepository;
 
     @Override
     public CreateOrderResponse create(CreateOrderRequest request) {
-        DeliveryMethod deliveryMethod = deliveryMethodService.findById(request.getDeliveryMethodId());
+        DeliveryMethod deliveryMethod = deliveryMethodRepository.findById(UUID.fromString(request.getDeliveryMethodId()))
+                .orElseThrow(()->new AppException(ErrorCode.DELIVERY_NOT_FOUND));
 
         Order order = orderMapper.toOrder(request);
 
@@ -42,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> items = request.getItems().stream()
                 .map(itemRequest -> {
-                    MenuItem menuItem = menuItemRepository.findById(itemRequest.getMenuItemId()).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
+                    MenuItem menuItem = menuItemRepository.findById(UUID.fromString(itemRequest.getMenuItemId())).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
                     OrderItem orderItem = new OrderItem();
                     orderItem.setOrder(order);
@@ -56,13 +58,13 @@ public class OrderServiceImpl implements OrderService {
 
         order.setItems(items);
 
-        order.setDeliveryMethod(deliveryMethodService.findById(request.getDeliveryMethodId()));
+        order.setDeliveryMethod(deliveryMethodRepository.findById(UUID.fromString(request.getDeliveryMethodId())).orElseThrow(()->new AppException(ErrorCode.DELIVERY_NOT_FOUND)));
 
         order.setShippingFee(order.getDeliveryMethod().getPrice());
 
         BigDecimal totalAmount = request.getItems().stream()
                 .map(itemRequest -> {
-                    MenuItem menuItem = menuItemRepository.findById(itemRequest.getMenuItemId()).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
+                    MenuItem menuItem = menuItemRepository.findById(UUID.fromString(itemRequest.getMenuItemId())).orElseThrow(() -> new AppException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
                     BigDecimal price = menuItem.getPrice();
                     int quantity = itemRequest.getQuantity();
@@ -74,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setTotalAmount(totalAmount);
 
-        order.setPaymentMethod(paymentMethodRepository.findById(request.getPaymentMethodId()).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED)));
+        order.setPaymentMethod(paymentMethodRepository.findById(UUID.fromString(request.getPaymentMethodId())).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED)));
 
         return orderMapper.toCreateOrderResponse(orderRepository.save(order));
     }
@@ -95,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setUser(userService.findById(UUID.fromString(request.getUserId())));
 
-        order.setDeliveryMethod(deliveryMethodService.findById(request.getDeliveryMethodId()));
+        order.setDeliveryMethod(deliveryMethodRepository.findById(UUID.fromString(request.getDeliveryMethodId())).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND)));
 
         order.setShippingFee(order.getDeliveryMethod().getPrice());
 

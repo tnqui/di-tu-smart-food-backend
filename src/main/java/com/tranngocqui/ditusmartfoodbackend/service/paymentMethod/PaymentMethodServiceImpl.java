@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,8 +25,8 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     private final PaymentServiceFactory paymentServiceFactory;
 
     @Override
-    public PaymentMethod findById(Long id) {
-        return paymentMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED));
+    public PaymentMethod findById(String id) {
+        return paymentMethodRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED));
     }
 
     @Override
@@ -32,7 +34,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
         PaymentMethod paymentMethod = paymentMethodRepository.save(paymentMethodMapper.toPaymentMethod(request));
 
         return PaymentMethodResponse.builder()
-                .id(paymentMethod.getId())
+                .id(String.valueOf(paymentMethod.getId()))
                 .name(paymentMethod.getName().name())
                 .description(paymentMethod.getDescription())
                 .build();

@@ -2,6 +2,8 @@ package com.tranngocqui.ditusmartfoodbackend.service.user;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
@@ -14,22 +16,17 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserResponse create(UserAdminRequest request);
+    UserAdminResponse create(UserAdminRequest request);
 
-    List<UserResponse> getAll();
+    List<UserAdminResponse> getAll();
 
-    UserProfileResponse getUser(UUID id);
+    UserAdminProfileResponse getUser(String id);
 
-    UserProfileResponse getUserByEmailOrPhone(String email, String phone);
+    UserAdminProfileResponse update(String id, UserUpdateRequest request);
 
-    UserProfileResponse update(UUID id, UserUpdateRequest request);
-
-    UserResponse updateProfile(UUID id, UserUpdateRequest request);
-
-    //    User updateUser(UUID id, UserUpdateRequest request);
     void delete(UUID id);
 
-    Page<UserResponse> getUsersPagination(Pageable pageable);
+    Page<UserAdminResponse> getUsersPagination(Pageable pageable);
 
     Optional<User> findByEmail(String email);
 
@@ -37,10 +34,6 @@ public interface UserService {
 
     User save(User user);
 
-    boolean existsById(UUID id);
-
     User findById(UUID id);
-
-    Optional<User> getUserProfileByEmailOrPhone(String email, String phone);
 
 }

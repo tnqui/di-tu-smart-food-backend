@@ -1,9 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.request.PermissionRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.PermissionResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.request.PermissionAdminRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.PermissionAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.permission.PermissionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,35 +17,37 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/permissions")
 @RequiredArgsConstructor
-public class PermissionController {
+public class PermissionAdminController {
     private final PermissionService permissionService;
 
     @PostMapping
-    ApiResponse<PermissionResponse> create(@RequestBody PermissionRequest request) {
-        return ApiResponse.<PermissionResponse>builder()
+    ApiResponse<PermissionAdminResponse> create(@Valid @RequestBody PermissionAdminRequest request) {
+        return ApiResponse.<PermissionAdminResponse>builder()
                 .result(permissionService.create(request))
                 .build();
     }
 
     @GetMapping("/all")
-    ApiResponse<List<PermissionResponse>> getAll() {
-        return ApiResponse.<List<PermissionResponse>>builder()
+    ApiResponse<List<PermissionAdminResponse>> getAll() {
+        return ApiResponse.<List<PermissionAdminResponse>>builder()
                 .result(permissionService.getAll())
                 .build();
     }
 
     @GetMapping
-    ApiResponse<Page<PermissionResponse>> getPermissionPagination(Pageable pageable) {
-        return ApiResponse.<Page<PermissionResponse>>builder()
+    ApiResponse<Page<PermissionAdminResponse>> getPermissionPagination(Pageable pageable) {
+        return ApiResponse.<Page<PermissionAdminResponse>>builder()
                 .result(permissionService.getPermissionPagination(pageable))
                 .build();
     }
 
-    @DeleteMapping("/{permission}")
-    ApiResponse<Void> delete(@PathVariable String permission) {
-        permissionService.delete(permission);
+    @DeleteMapping("/{id}")
+    ApiResponse<Void> delete(@PathVariable String id) {
+        permissionService.delete(id);
         return ApiResponse.<Void>builder()
                 .build();
     }
+
+
 
 }

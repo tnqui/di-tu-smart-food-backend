@@ -23,7 +23,7 @@ public class AddressAdminController {
     }
 
     @GetMapping("{id}")
-    ApiResponse<AddressAdminResponse> get(@PathVariable Long id) {
+    ApiResponse<AddressAdminResponse> get(@PathVariable String id) {
         return ApiResponse.<AddressAdminResponse>builder()
                 .result(addressService.get(id))
                 .build();
@@ -38,16 +38,15 @@ public class AddressAdminController {
 
 
     @PatchMapping("{id}")
-    ApiResponse<AddressAdminResponse> update(@PathVariable Long id, @RequestBody AddressAdminRequest request) {
+    ApiResponse<AddressAdminResponse> update(@PathVariable String id, @RequestBody AddressAdminRequest request) {
         return ApiResponse.<AddressAdminResponse>builder()
                 .result(addressService.update(id, request))
                 .build();
     }
 
     @DeleteMapping("{id}")
-    void delete(@PathVariable Long id) {
+    void delete(@PathVariable String id) {
         addressService.delete(id);
     }
-
 
 }

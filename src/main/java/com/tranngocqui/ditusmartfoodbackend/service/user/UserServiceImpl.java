@@ -2,18 +2,17 @@ package com.tranngocqui.ditusmartfoodbackend.service.user;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminProfileResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.mapper.RoleMapper;
 import com.tranngocqui.ditusmartfoodbackend.mapper.UserMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.RoleRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
+import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,67 +27,62 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
-
     private final PasswordEncoder passwordEncoder;
-    private final RoleMapper roleMapper;
 
     @Override
     @PreAuthorize("hasAnyAuthority('CREATE_USER','ROLE_ADMIN')")
-    public UserResponse create(UserAdminRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+    public UserAdminResponse create(UserAdminRequest request) {
+        User user = userMapper.toUser(request);
+
+        if (userRepository.existsByEmail(request.email())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        if (userRepository.existsByPhone(request.getPhone())) {
+        if (userRepository.existsByPhone(request.phone())) {
             throw new AppException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
 
-        var listValidRole = roleRepository.findAllById(request.getRoles());
+        if (request.roles() != null) {
+            var listValidRole = roleRepository.findAllById(UUIDUtils.fromSetString(request.roles()));
 
-        if (listValidRole.size() != request.getRoles().size()) {
-            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+            if (listValidRole.size() != request.roles().size()) {
+                throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+            }
+            user.setRoles(new HashSet<>(listValidRole));
         }
-
-        User user = userMapper.toUser(request);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        user.setRoles(new HashSet<>(listValidRole));
         user.setCreatedAt(LocalDateTime.now());
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        return userMapper.toUserAdminResponse(userRepository.save(user));
     }
 
     @Override
-    public List<UserResponse> getAll() {
+    public List<UserAdminResponse> getAll() {
         var users = userRepository.findAll();
         return userMapper.toUserResponseList(users);
     }
 
     @Override
-    public UserProfileResponse getUser(UUID id) {
-        return userMapper.toUserProfileResponse(
-                userRepository.findUserProfileById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+    public UserAdminProfileResponse getUser(String id) {
+        return userMapper.toUserAdminProfileResponse(
+                userRepository.findUserProfileById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
     @Override
-    public UserProfileResponse getUserByEmailOrPhone(String email, String phone) {
-        return userMapper.toUserProfileResponse(
-                userRepository.findUserProfileByEmailOrPhone(email, phone).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
-    }
-
-    @Override
-    public UserProfileResponse update(UUID id, UserUpdateRequest request) {
-        User user = userRepository.findById(id)
+    public UserAdminProfileResponse update(String id, UserUpdateRequest request) {
+        User user = userRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         userMapper.updateUser(user, request);
 
         if (request.getRoles() != null) {
-            var roles = roleRepository.findAllById(request.getRoles());
+            var roles = roleRepository.findAllById(UUIDUtils.fromSetString(request.getRoles()));
 
             if (request.getRoles().size() != roles.size()) {
                 throw new AppException(ErrorCode.ROLE_NOT_FOUND);
@@ -106,21 +100,22 @@ public class UserServiceImpl implements UserService {
         return getUser(id);
     }
 
-    @Override
-    public UserResponse updateProfile(UUID id, UserUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return null;
-    }
 
     @Override
     public void delete(UUID id) {
+        userRepository.existsById(id);
+
+        if (!userRepository.existsById(id)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
         userRepository.deleteById(id);
     }
 
     @Override
-    public Page<UserResponse> getUsersPagination(Pageable pageable) {
+    public Page<UserAdminResponse> getUsersPagination(Pageable pageable) {
         return userRepository.findAll(pageable)
-                .map(userMapper::toUserResponse);
+                .map(userMapper::toUserAdminResponse);
     }
 
     @Override
@@ -138,27 +133,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return userRepository.existsById(id);
-    }
 
     @Override
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    @Override
-    public Optional<User> getUserProfileByEmailOrPhone(String email, String phone) {
-        return userRepository.findUserProfileByEmailOrPhone(email, phone);
-    }
 
-//    @Override
-//    public Page<UserResponse> getUsersPagination(int _start, int _end) {
-//
-//        Page<User> page = userRepository.findAll(PageRequest.of(_start, _end));
-//
-//        return userMapper.toUserResponse(page);
-//    }
 
 }

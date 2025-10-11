@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryMethodAdminResponse {
-    private Long id;
+    private String id;
 
     private String name;
 

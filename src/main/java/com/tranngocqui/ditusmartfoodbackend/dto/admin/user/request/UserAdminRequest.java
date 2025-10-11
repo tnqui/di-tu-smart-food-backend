@@ -1,32 +1,27 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
-@Builder
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserAdminRequest {
-    private String fullName;
-    private String email;
-    private String phone;
-    private String password;
-    private Boolean isEmailVerified;
-    private Boolean isPhoneVerified;
-    private boolean enabled;
-    private Boolean accountStatus;
-    private Integer loginAttempts;
-    private LocalDateTime lastLoginAt;
-    private String lastLoginIp;
-    private String avatarUrl;
-    private String language;
-    private Boolean twoFactorEnabled;
-    private String timezone;
-    private Set<String> roles;
+public record UserAdminRequest(
+        String fullName,
+        String email,
+        String phone,
+        @NotNull
+        String password,
+        Boolean isEmailVerified,
+        Boolean isPhoneVerified,
+        boolean enabled,
+        Boolean accountStatus,
+        LocalDateTime lastLoginAt,
+        String lastLoginIp,
+        String avatarUrl,
+        String language,
+        Boolean twoFactorEnabled,
+        String timezone,
+        Set<String> roles
+) {
 }

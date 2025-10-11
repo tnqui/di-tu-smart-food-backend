@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,8 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     }
 
     @Override
-    public DeliveryMethodAdminResponse update(Long id, DeliveryMethodAdminRequest request) {
-        DeliveryMethod deliveryMethod = deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
+    public DeliveryMethodAdminResponse update(String id, DeliveryMethodAdminRequest request) {
+        DeliveryMethod deliveryMethod = deliveryMethodRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
 
         deliveryMethodMapper.update(request, deliveryMethod);
 
@@ -36,13 +37,13 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     }
 
     @Override
-    public void delete(Long id) {
-        deliveryMethodRepository.deleteById(id);
+    public void delete(String id) {
+        deliveryMethodRepository.deleteById(UUID.fromString(id));
     }
 
     @Override
-    public DeliveryMethodAdminResponse get(Long id) {
-        return deliveryMethodMapper.toDeliveryMethodAdminResponse(deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND)));
+    public DeliveryMethodAdminResponse get(String id) {
+        return deliveryMethodMapper.toDeliveryMethodAdminResponse(deliveryMethodRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND)));
     }
 
     @Override
@@ -56,7 +57,7 @@ public class DeliveryMethodServiceImpl implements DeliveryMethodService {
     }
 
     @Override
-    public DeliveryMethod findById(Long id) {
-        return deliveryMethodRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
+    public DeliveryMethod findById(String id) {
+        return deliveryMethodRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.DELIVERY_NOT_FOUND));
     }
 }

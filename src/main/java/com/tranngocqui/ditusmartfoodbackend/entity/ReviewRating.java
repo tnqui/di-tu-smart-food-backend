@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,8 +19,7 @@ import java.time.LocalDateTime;
 public class ReviewRating {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", columnDefinition = "UUID")
@@ -41,7 +42,11 @@ public class ReviewRating {
     private LocalDateTime createdAt;
 
     @PrePersist
-    protected void onCreate() {
+    public void prePersist() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
         this.createdAt = LocalDateTime.now();
+
     }
 }

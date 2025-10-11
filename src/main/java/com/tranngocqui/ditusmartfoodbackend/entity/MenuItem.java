@@ -1,5 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.fasterxml.uuid.Generators;
+import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
+import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,14 +10,14 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 public class MenuItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private String name;
     private String description;
@@ -40,4 +43,11 @@ public class MenuItem {
     @JoinColumn(name = "primary_category_Id", referencedColumnName = "id")
     private Category primaryCategory;
 
+    @PrePersist
+    protected void onCreate() {
+        if (id == null) {
+            id = Generators.timeBasedEpochRandomGenerator().generate();
+        }
+        this.createdAt = LocalDateTime.now();
+    }
 }

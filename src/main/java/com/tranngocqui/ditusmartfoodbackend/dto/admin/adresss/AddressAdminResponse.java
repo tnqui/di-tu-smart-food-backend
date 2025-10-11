@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class AddressAdminResponse {
-    private Long id;
+    private String id;
     private String label;
     private String fullAddress;
     private Double latitude;

@@ -3,12 +3,16 @@ package com.tranngocqui.ditusmartfoodbackend.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    BAD_REQUEST(400, "Bad Request"),
     // ========== SYSTEM ERRORS (9000-9999) ==========
-    NOT_FOUND(404, "Not Found"),
-    UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Exception"),
+    UNCATEGORIZED_EXCEPTION(9999, "Uncategorized exception"),
     INTERNAL_SERVER_ERROR(9001, "Internal server error"),
     INVALID_MESSAGE_KEY(9002, "Invalid message key"),
     SERVICE_UNAVAILABLE(9003, "Service temporarily unavailable"),
@@ -17,37 +21,36 @@ public enum ErrorCode {
     FILE_PROCESSING_ERROR(9006, "File processing error"),
     SOMETHING_WENT_WRONG(9007, "Something went wrong"),
     CANNOT_SEND_VERIFICATION_CODE(9008, "Cannot send verification code"),
-    TOO_MANY_REQUEST(9009, "Too many requests, please try again later"),
-    ILLEGAL_ARGUMENTS(9011, "Illegal arguments"),
-    MAPBOX_ERROR(9013, "Mapbox Error"),
+    TOO_MANY_REQUESTS(9009, "Too many requests, please try again later"),
+    ILLEGAL_ARGUMENTS(9010, "Illegal arguments"),
+    MAPBOX_ERROR(9011, "Mapbox service error"),
+    NOT_FOUND(9012, "Resource not found"),
 
     // ========== AUTHENTICATION ERRORS (1000-1099) ==========
-
-    UNAUTHENTICATED(1001, "Authentication required"),
+    UNAUTHENTICATED(1000, "Authentication required"),
+    INVALID_USERNAME_OR_PASSWORD(1001, "Invalid username or password"),
     INVALID_TOKEN(1002, "Invalid or expired token"),
     TOKEN_EXPIRED(1003, "Token has expired"),
     REFRESH_TOKEN_INVALID(1004, "Invalid refresh token"),
     REFRESH_TOKEN_EXPIRED(1005, "Refresh token has expired"),
-    LOGIN_FAILED(1006, "Invalid username or password"),
+    INVALID_TOKEN_SESSION(1006, "Invalid token session"),
     ACCOUNT_LOCKED(1007, "Account has been locked"),
     ACCOUNT_DISABLED(1008, "Account has been disabled"),
     ACCOUNT_NOT_VERIFIED(1009, "Account not verified"),
     PASSWORD_EXPIRED(1010, "Password has expired"),
     TOO_MANY_LOGIN_ATTEMPTS(1011, "Too many failed login attempts"),
-    SUCCESS(1012, "Success"),
-    TWO_FACTOR_REQUIRED(1013, "Two factor code required"),
-    TWO_FACTOR_MISMATCH(1014, "Two factor code does not match"),
-    TWO_FACTOR_NOT_ENABLED(1015, "Two factor code is not enabled"),
-    INVALID_TWO_FACTOR_CODE(1016, "Invalid two factor code provided"),
-    INVALID_USERNAME_OR_PASSWORD(1017, "Invalid username or password"),
-    INVALID_TOKEN_SESSION(1018, "Invalid token session"),
+    TWO_FACTOR_REQUIRED(1012, "Two-factor authentication required"),
+    TWO_FACTOR_MISMATCH(1013, "Two-factor code does not match"),
+    TWO_FACTOR_NOT_ENABLED(1014, "Two-factor authentication is not enabled"),
+    INVALID_TWO_FACTOR_CODE(1015, "Invalid two-factor code"),
 
     // ========== AUTHORIZATION ERRORS (1100-1199) ==========
-    UNAUTHORIZED(1100, "Unauthorized"),
-    INSUFFICIENT_PERMISSION(1101, "Insufficient permissions"),
-    PERMISSION_NOT_FOUND(1102, "Permission not found"),
-    ROLE_NOT_FOUND(1103, "Role not found"),
-    ACCESS_DENIED(1104, "Access denied to this resource"),
+    FORBIDDEN(1100, "Access forbidden"),
+    UNAUTHORIZED(1101, "Unauthorized access"),
+    INSUFFICIENT_PERMISSION(1102, "Insufficient permissions"),
+    PERMISSION_NOT_FOUND(1103, "Permission not found"),
+    ROLE_NOT_FOUND(1104, "Role not found"),
+    ACCESS_DENIED(1105, "Access denied to this resource"),
 
     // ========== VALIDATION ERRORS (1200-1299) ==========
     VALIDATION_ERROR(1200, "Validation failed"),
@@ -70,8 +73,10 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(1304, "Username already exists"),
     INVALID_USER_STATUS(1305, "Invalid user status"),
     USER_PROFILE_INCOMPLETE(1306, "User profile is incomplete"),
-    PHONE_IS_REQUIRED(1307, "phone number is required"),
+    PHONE_IS_REQUIRED(1307, "Phone number is required"),
     ADDRESS_NOT_FOUND(1308, "Address not found"),
+    PHONE_OR_EMAIL_IS_REQUIRED(1309, "Phone or email is required"),
+    PHONE_OR_EMAIL_INVALID(1310, "Invalid phone or email format"),
 
     // ========== PASSWORD ERRORS (1400-1499) ==========
     PASSWORD_IS_REQUIRED(1400, "Password is required"),
@@ -81,12 +86,20 @@ public enum ErrorCode {
     OLD_PASSWORD_INCORRECT(1404, "Current password is incorrect"),
     PASSWORD_RECENTLY_USED(1405, "Password was recently used"),
     PASSWORD_CONTAINS_PERSONAL_INFO(1406, "Password cannot contain personal information"),
-    PASSWORD_BETWEEN_8_TO_20_CHARACTERS(1407, "Password between 8 to 20 characters"),
-    PASSWORD_CONFIRMED(1408, "Please confirm your password"),
+    PASSWORD_BETWEEN_8_TO_20_CHARACTERS(1407, "Password must be between 8 to 20 characters"),
+    PASSWORD_CONFIRMATION_REQUIRED(1408, "Password confirmation is required"),
     PASSWORD_DOES_NOT_MATCH(1409, "Password does not match"),
 
-    // ========== FOOD & MENU ERRORS (2000-2099) ==========
+    // ========== REGISTRATION & VERIFICATION ERRORS (1500-1599) ==========
+    REGISTRATION_FAILED(1500, "Registration failed"),
+    EMAIL_VERIFICATION_REQUIRED(1501, "Email verification required"),
+    PHONE_VERIFICATION_REQUIRED(1502, "Phone verification required"),
+    VERIFICATION_CODE_INVALID(1503, "Invalid verification code"),
+    VERIFICATION_CODE_EXPIRED(1504, "Verification code has expired"),
+    ACCOUNT_SETUP_INCOMPLETE(1505, "Account setup is incomplete"),
+
     FOOD_NOT_FOUND(2000, "Food item not found"),
+    // ========== FOOD & MENU ERRORS (2000-2099) ==========
     FOOD_OUT_OF_STOCK(2001, "Food item is out of stock"),
     FOOD_UNAVAILABLE(2002, "Food item is currently unavailable"),
     INVALID_FOOD_CATEGORY(2003, "Invalid food category"),
@@ -95,19 +108,20 @@ public enum ErrorCode {
     FOOD_PRICE_INVALID(2006, "Invalid food price"),
     FOOD_ALREADY_EXISTS(2007, "Food item already exists"),
     MENU_ITEM_NOT_FOUND(2008, "Menu item not found"),
+
     // ========== ORDER ERRORS (2100-2199) ==========
     ORDER_NOT_FOUND(2100, "Order not found"),
-    ORDER_ALREADY_CANCELLED(2101, "Order has already been cancelled"),
-    ORDER_CANNOT_BE_CANCELLED(2102, "Order cannot be cancelled at this stage"),
-    ORDER_ALREADY_COMPLETED(2103, "Order has already been completed"),
-    INVALID_ORDER_STATUS(2104, "Invalid order status"),
-    ORDER_EMPTY(2105, "Order cannot be empty"),
-    ORDER_AMOUNT_MISMATCH(2106, "Order amount calculation mismatch"),
-    ORDER_TIME_EXPIRED(2107, "Order time has expired"),
-    DELIVERY_ADDRESS_REQUIRED(2108, "Delivery address is required"),
-    INVALID_DELIVERY_TIME(2109, "Invalid delivery time"),
-    ORDER_FORBIDDEN(2110, "You are not allowed to access this order"),
-    ORDER_DOES_NOT_EXIST(2111,"Order does not exist"),
+    ORDER_DOES_NOT_EXIST(2101, "Order does not exist"),
+    ORDER_ALREADY_CANCELLED(2102, "Order has already been cancelled"),
+    ORDER_CANNOT_BE_CANCELLED(2103, "Order cannot be cancelled at this stage"),
+    ORDER_ALREADY_COMPLETED(2104, "Order has already been completed"),
+    INVALID_ORDER_STATUS(2105, "Invalid order status"),
+    ORDER_EMPTY(2106, "Order cannot be empty"),
+    ORDER_AMOUNT_MISMATCH(2107, "Order amount calculation mismatch"),
+    ORDER_TIME_EXPIRED(2108, "Order time has expired"),
+    DELIVERY_ADDRESS_REQUIRED(2109, "Delivery address is required"),
+    INVALID_DELIVERY_TIME(2110, "Invalid delivery time"),
+    ORDER_FORBIDDEN(2111, "You are not allowed to access this order"),
 
     // ========== PAYMENT ERRORS (2200-2299) ==========
     PAYMENT_FAILED(2200, "Payment processing failed"),
@@ -188,24 +202,16 @@ public enum ErrorCode {
     EXTERNAL_API_TIMEOUT(3102, "External API timeout"),
     INTEGRATION_CONFIGURATION_ERROR(3103, "Integration configuration error"),
     WEBHOOK_PROCESSING_FAILED(3104, "Webhook processing failed"),
-    GENERATE_QR_FAILED(3105, "Generate QR failed"),
+    GENERATE_QR_FAILED(3105, "QR code generation failed"),
+
     // ========== BUSINESS LOGIC ERRORS (3200-3299) ==========
     BUSINESS_RULE_VIOLATION(3200, "Business rule violation"),
     OPERATION_NOT_ALLOWED(3201, "Operation not allowed"),
     DEPENDENCY_EXISTS(3202, "Cannot delete due to existing dependencies"),
     DUPLICATE_OPERATION(3203, "Duplicate operation detected"),
-    RESOURCE_IN_USE(3204, "Resource is currently in use"),
-
-    // ========== SPECIFIC APP ERRORS (3300-3399) ==========
-    PHONE_OR_EMAIL_IS_REQUIRED(3300, "Phone or email is required"),
-    PHONE_OR_EMAIL_INVALID(3301, "Invalid phone or email format"),
-    REGISTRATION_FAILED(3302, "Registration failed"),
-    EMAIL_VERIFICATION_REQUIRED(3303, "Email verification required"),
-    PHONE_VERIFICATION_REQUIRED(3304, "Phone verification required"),
-    VERIFICATION_CODE_INVALID(3305, "Invalid verification code"),
-    VERIFICATION_CODE_EXPIRED(3306, "Verification code has expired"),
-    ACCOUNT_SETUP_INCOMPLETE(3307, "Account setup is incomplete");
+    RESOURCE_IN_USE(3204, "Resource is currently in use");
 
     private final int code;
     private final String message;
+
 }

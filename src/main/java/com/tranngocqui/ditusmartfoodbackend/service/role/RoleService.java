@@ -2,8 +2,7 @@ package com.tranngocqui.ditusmartfoodbackend.service.role;
 
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request.RoleRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithoutPermissionsResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,15 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RoleService {
-    List<RoleWithoutPermissionsResponse> getAll();
+    List<RoleAdminResponse> getAll();
 
-    RoleWithoutPermissionsResponse create(RoleRequest request);
+    RoleAdminResponse create(RoleRequest request);
 
-    RoleWithoutPermissionsResponse update(RoleRequest request);
+    RoleAdminResponse update(RoleRequest request);
 
-    void delete(String role);
+    void delete(String id);
 
     Optional<Role> findByName(String name);
 
-    Page<RoleResponse> getRolePagination(Pageable pageable);
+    Page<RoleAdminResponse> getRolePagination(Pageable pageable);
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Builder
 @Data
@@ -27,5 +29,5 @@ public class UserUpdateRequest {
     private String language;
     private Boolean twoFactorEnabled;
     private String timezone;
-    private List<String> roles;
+    private Set<String> roles;
 }
