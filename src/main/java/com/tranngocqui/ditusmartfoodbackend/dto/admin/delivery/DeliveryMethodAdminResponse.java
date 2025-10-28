@@ -1,24 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.delivery;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
-import java.time.LocalDateTime;
-
-@Builder
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DeliveryMethodAdminResponse {
-    private String id;
-
-    private String name;
-
-    private String description;
-
-    private Integer time;
-
-    private Double price;
+public record DeliveryMethodAdminResponse(
+        String id,
+        String shortName,
+        String fullName,
+        BigDecimal pricePerKm) {
 }

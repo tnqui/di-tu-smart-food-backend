@@ -1,13 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.request;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.client.response.OrderItemResponse;
-import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 public class CreateOrderRequest {

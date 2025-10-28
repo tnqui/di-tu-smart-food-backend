@@ -25,7 +25,7 @@ public enum ErrorCode {
     ILLEGAL_ARGUMENTS(9010, "Illegal arguments"),
     MAPBOX_ERROR(9011, "Mapbox service error"),
     NOT_FOUND(9012, "Resource not found"),
-
+    ENTITY_NOT_FOUND(9013, "Entity not found"),
     // ========== AUTHENTICATION ERRORS (1000-1099) ==========
     UNAUTHENTICATED(1000, "Authentication required"),
     INVALID_USERNAME_OR_PASSWORD(1001, "Invalid username or password"),
@@ -43,12 +43,11 @@ public enum ErrorCode {
     TWO_FACTOR_MISMATCH(1013, "Two-factor code does not match"),
     TWO_FACTOR_NOT_ENABLED(1014, "Two-factor authentication is not enabled"),
     INVALID_TWO_FACTOR_CODE(1015, "Invalid two-factor code"),
-
+    USER_HAS_BEEN_DELETED(1016, "User has been deleted"),
     // ========== AUTHORIZATION ERRORS (1100-1199) ==========
     FORBIDDEN(1100, "Access forbidden"),
     UNAUTHORIZED(1101, "Unauthorized access"),
     INSUFFICIENT_PERMISSION(1102, "Insufficient permissions"),
-    PERMISSION_NOT_FOUND(1103, "Permission not found"),
     ROLE_NOT_FOUND(1104, "Role not found"),
     ACCESS_DENIED(1105, "Access denied to this resource"),
 
@@ -107,8 +106,8 @@ public enum ErrorCode {
     MENU_INACTIVE(2005, "Menu is not active"),
     FOOD_PRICE_INVALID(2006, "Invalid food price"),
     FOOD_ALREADY_EXISTS(2007, "Food item already exists"),
-    MENU_ITEM_NOT_FOUND(2008, "Menu item not found"),
-
+    ITEM_NOT_FOUND(2008, "Menu item not found"),
+    EMPTY_LIST_ITEM(2009, "Empty list item"),
     // ========== ORDER ERRORS (2100-2199) ==========
     ORDER_NOT_FOUND(2100, "Order not found"),
     ORDER_DOES_NOT_EXIST(2101, "Order does not exist"),
@@ -152,7 +151,7 @@ public enum ErrorCode {
     OPERATING_HOURS_EXCEEDED(2405, "Outside restaurant operating hours"),
 
     // ========== DELIVERY ERRORS (2500-2599) ==========
-    DELIVERY_NOT_FOUND(2500, "Delivery not found"),
+    DELIVERY_METHOD_NOT_FOUND(2500, "Delivery method not found"),
     DELIVERY_ALREADY_ASSIGNED(2501, "Delivery already assigned"),
     NO_DELIVERY_AVAILABLE(2502, "No delivery personnel available"),
     DELIVERY_CANCELLED(2503, "Delivery has been cancelled"),
@@ -209,8 +208,21 @@ public enum ErrorCode {
     OPERATION_NOT_ALLOWED(3201, "Operation not allowed"),
     DEPENDENCY_EXISTS(3202, "Cannot delete due to existing dependencies"),
     DUPLICATE_OPERATION(3203, "Duplicate operation detected"),
-    RESOURCE_IN_USE(3204, "Resource is currently in use");
+    RESOURCE_IN_USE(3204, "Resource is currently in use"),
 
+    PERMISSION_NOT_FOUND(3300, "Permission not found"),
+    PERMISSION_ALREADY_EXISTS(3301, "Permission already exists"),
+    PERMISSION_IN_USE(3302, "Permission is currently assigned to roles"),
+    ROLE_ALREADY_EXISTS(3303, "Role already exists"),
+    ROLE_DUPLICATE_NAME(3304, "Role name already taken"),
+    ROLE_DELETE_FORBIDDEN(3305, "Cannot delete role with assigned users"),
+
+    CATEGORY_NOT_FOUND(3400, "Category not found"),
+    CATEGORY_ALREADY_EXISTS(3401, "Category name already exists"),
+    CATEGORY_IN_USE(3402, "Category is in use and cannot be deleted"),
+    CATEGORY_VALIDATION_FAILED(3403, "Invalid category data"),
+
+    ORDER_ITEM_NOT_FOUND(3404, "Order item not found");
     private final int code;
     private final String message;
 

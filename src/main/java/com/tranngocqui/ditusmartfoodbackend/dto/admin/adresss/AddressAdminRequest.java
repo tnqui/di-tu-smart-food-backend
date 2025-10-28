@@ -15,5 +15,5 @@ public class AddressAdminRequest {
     private String label;
     private String fullAddress;
     private boolean defaultAddress;
-    private UUID userId;
+    private String userId;
 }

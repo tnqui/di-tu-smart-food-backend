@@ -4,7 +4,7 @@ import com.tranngocqui.ditusmartfoodbackend.enums.PaymentStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 public class PaymentQueryResponse {
@@ -12,5 +12,5 @@ public class PaymentQueryResponse {
     private String transactionId;
     private BigDecimal amount;
     private String errorMessage;
-    private LocalDateTime paidAt;
+    private Instant paidAt;
 }

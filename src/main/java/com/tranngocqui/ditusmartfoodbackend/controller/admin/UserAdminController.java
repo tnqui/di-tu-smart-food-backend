@@ -2,12 +2,10 @@ package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request.UserAdminUpdateRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminProfileResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserAdminResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserProfileResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -41,7 +36,7 @@ public class UserAdminController {
     }
 
     @PatchMapping("/{userId}")
-    ApiResponse<UserAdminProfileResponse> update(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    ApiResponse<UserAdminProfileResponse> update(@PathVariable String userId, @RequestBody UserAdminUpdateRequest request) {
         return ApiResponse.<UserAdminProfileResponse>builder()
                 .result(userService.update(userId, request))
                 .build();
@@ -51,13 +46,13 @@ public class UserAdminController {
     public ApiResponse<Page<UserAdminResponse>> getUsersPagination(
             @PageableDefault(size = 10, page = 0, sort = "fullName") Pageable pageable) {
         return ApiResponse.<Page<UserAdminResponse>>builder()
-                .result(userService.getUsersPagination(pageable))
+                .result(userService.getAll(pageable))
                 .build();
     }
 
     @DeleteMapping("/{userId}")
-    ApiResponse<Void> deleteUser(@PathVariable UUID userId) {
-        userService.delete(userId);
+    ApiResponse<Void> deleteUser(@PathVariable String userId) {
+        userService.deleteById(userId);
         return ApiResponse.<Void>builder()
                 .message("Successfully deleted user")
                 .build();

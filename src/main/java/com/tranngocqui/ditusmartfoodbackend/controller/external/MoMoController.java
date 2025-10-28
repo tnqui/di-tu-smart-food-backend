@@ -3,12 +3,8 @@ package com.tranngocqui.ditusmartfoodbackend.controller.external;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentTransactionResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentWebhookBase;
 import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentWebhookResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.PaymentTransaction;
-import com.tranngocqui.ditusmartfoodbackend.mapper.PaymentTransactionMapper;
-import com.tranngocqui.ditusmartfoodbackend.service.paymenttransaction.PaymentTransactionService;
-import jakarta.transaction.Transactional;
+import com.tranngocqui.ditusmartfoodbackend.service.application.paymenttransaction.PaymentTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

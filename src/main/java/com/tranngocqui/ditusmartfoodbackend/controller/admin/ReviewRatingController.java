@@ -8,4 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/review-ratings")
 @CrossOrigin(origins = "*")
 public class ReviewRatingController {
+
+
+
+
+
+
+
+
+
+
 }

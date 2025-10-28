@@ -24,7 +24,7 @@ public class CustomUserDetails implements UserDetails {
         return user.getRoles()
                 .stream()
                 .map(role -> {
-                    String roleName = role.getName();
+                    String roleName = role.getName().name();
                     if (roleName.startsWith("ROLE_")) {
                         return new SimpleGrantedAuthority(roleName);
                     } else {

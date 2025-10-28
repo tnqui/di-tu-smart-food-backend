@@ -7,7 +7,7 @@ import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
-import com.tranngocqui.ditusmartfoodbackend.service.jwt.JwtService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 String username = jwt.getSubject();
+
                 CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -73,14 +74,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-
-//            } catch (ExpiredJwtException ex) {
-//
-//            } catch () {
-//
-//            } catch () {
-//
-//            } catch () {
 
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();

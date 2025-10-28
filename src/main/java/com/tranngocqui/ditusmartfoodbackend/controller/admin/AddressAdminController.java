@@ -3,7 +3,7 @@ package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.address.AddressService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.address.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

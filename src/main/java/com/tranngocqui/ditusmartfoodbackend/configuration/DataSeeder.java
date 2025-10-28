@@ -1,26 +1,44 @@
 package com.tranngocqui.ditusmartfoodbackend.configuration;
 
-import com.tranngocqui.ditusmartfoodbackend.entity.Category;
-import com.tranngocqui.ditusmartfoodbackend.entity.MenuItem;
-import com.tranngocqui.ditusmartfoodbackend.repository.CategoryRepository;
-import com.tranngocqui.ditusmartfoodbackend.repository.MenuItemRepository;
+import com.tranngocqui.ditusmartfoodbackend.constant.PermissionDescriptionConstant;
+import com.tranngocqui.ditusmartfoodbackend.constant.PermissionNameConstant;
+import com.tranngocqui.ditusmartfoodbackend.entity.*;
+import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethodProvider;
+import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethodProvider;
+import com.tranngocqui.ditusmartfoodbackend.enums.RoleEnum;
+import com.tranngocqui.ditusmartfoodbackend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
-    private final MenuItemRepository menuItemRepository;
+    private final ItemRepository menuItemRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final DeliveryMethodRepository deliveryMethodRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
 
     @Override
     public void run(String... args) throws Exception {
+        // Kiểm tra nếu database đã có dữ liệu thì không seed
+        if (categoryRepository.count() > 0 || menuItemRepository.count() > 0) {
+            System.out.println("Database already has data. Skipping seeding.");
+            return;
+        }
+
+        System.out.println("Database is empty. Starting data seeding...");
 
         // 1. Tạo category với ảnh minh họa
         Map<String, String> categoryData = Map.of(
@@ -136,7 +154,7 @@ public class DataSeeder implements CommandLineRunner {
 
             for (MenuItemData itemData : entry.getValue()) {
                 for (int i = 1; i <= repeatCount; i++) {
-                    MenuItem menuItem = new MenuItem();
+                    Item menuItem = new Item();
                     String suffix = " #" + i;
 
                     menuItem.setName(itemData.name + suffix);
@@ -171,12 +189,11 @@ public class DataSeeder implements CommandLineRunner {
                     // Ảnh minh họa public
                     menuItem.setImageUrl(itemData.imageUrl);
 
-                    menuItem.setEnabled(true);
                     menuItem.setIsAvailable(menuItem.getStock() > 0);
 
-                    LocalDateTime createdTime = LocalDateTime.now().minusDays(random.nextInt(30));
+                    Instant createdTime = Instant.now();
                     menuItem.setCreatedAt(createdTime);
-                    menuItem.setUpdatedAt(createdTime.plusDays(random.nextInt(5)));
+                    menuItem.setUpdatedAt(createdTime);
 
                     menuItem.setPrimaryCategory(category);
                     menuItem.setCategories(Set.of(category));
@@ -186,7 +203,32 @@ public class DataSeeder implements CommandLineRunner {
             }
         }
 
-        System.out.println("✅ Seeded " + menuItemRepository.count() + " menu items across " + categoryRepository.count() + " categories!");
+        Permission permission = permissionRepository.save(Permission.builder()
+                .name(PermissionNameConstant.CUSTOMER)
+                .description(PermissionDescriptionConstant.CUSTOMER)
+                .build());
+
+        Role role = roleRepository.save(Role.builder()
+                .name(RoleEnum.CUSTOMER)
+                .permissions(Set.of(permission))
+                .build());
+
+        User user = userRepository.save(User.builder()
+                .roles(Set.of(role))
+                .build());
+
+        DeliveryMethod deliveryMethod = deliveryMethodRepository.save(DeliveryMethod.builder()
+                .shortName(DeliveryMethodProvider.IN_HOUSE)
+                .fullName(DeliveryMethodProvider.IN_HOUSE.getFullName())
+                .pricePerKm(BigDecimal.valueOf(30000))
+                .build());
+
+        PaymentMethod paymentMethod = paymentMethodRepository.save(PaymentMethod.builder()
+                .shortName(PaymentMethodProvider.COD)
+                .fullName(PaymentMethodProvider.COD.getFullName())
+                .build());
+
+        System.out.println("Successfully Created Data");
     }
 
     // Inner class

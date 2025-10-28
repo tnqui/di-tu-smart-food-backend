@@ -1,22 +1,21 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
-import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
-import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-@Entity
 @Getter
 @Setter
-public class Address {
-    @Id
-    private UUID id;
-
+@Entity
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+public class Address extends BaseEntity {
     private String label;
     private String fullAddress;
     private Double latitude;
@@ -26,11 +25,4 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @PrePersist
-    protected void onCreate() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-    }
 }

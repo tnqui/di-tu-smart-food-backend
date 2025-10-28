@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +14,5 @@ import java.time.LocalDateTime;
 public class RoleResponse {
     private String name;
     private String description;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

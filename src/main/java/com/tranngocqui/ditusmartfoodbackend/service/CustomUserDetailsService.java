@@ -21,6 +21,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
         User user = userRepository.findByEmailOrPhone(identifier, identifier)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getDeleted()) {
+            throw new AppException(ErrorCode.USER_HAS_BEEN_DELETED);
+        }
         return new CustomUserDetails(user);
     }
 

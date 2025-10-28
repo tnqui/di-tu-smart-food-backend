@@ -4,8 +4,8 @@ import com.tranngocqui.ditusmartfoodbackend.entity.TwoFactorAuthenticationToken;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
-import com.tranngocqui.ditusmartfoodbackend.service.auth.GoogleAuthenticatorService;
-import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.auth.GoogleAuthenticatorService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,7 +31,7 @@ public class TwoFactorAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        User user = userService.findByEmail(username).orElseThrow(() -> new BadCredentialsException("Username not found"));
+        User user = userService.getByEmail(username).orElseThrow(() -> new BadCredentialsException("Username not found"));
 
         if (user == null) {
             throw new BadCredentialsException("User không tồn tại");

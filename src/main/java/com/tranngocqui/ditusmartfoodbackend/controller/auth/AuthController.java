@@ -1,17 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.auth;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.*;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.TwoFASetupRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request.TwoFAVerifyRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response.UserResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.Auth2FAResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.AuthRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.AuthResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
-import com.tranngocqui.ditusmartfoodbackend.entity.User;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.UserMapper;
-import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthenticationService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

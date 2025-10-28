@@ -6,15 +6,14 @@ import com.tranngocqui.ditusmartfoodbackend.dto.client.response.AuthClientRespon
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.mapper.ClientMapper;
-import com.tranngocqui.ditusmartfoodbackend.service.jwt.JwtServiceImpl;
-import com.tranngocqui.ditusmartfoodbackend.service.clientservice.AuthClientService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtServiceImpl;
+import com.tranngocqui.ditusmartfoodbackend.service.application.clientservice.AuthClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

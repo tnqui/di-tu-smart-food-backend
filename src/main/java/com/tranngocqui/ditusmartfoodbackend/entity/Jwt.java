@@ -3,24 +3,22 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 import com.tranngocqui.ditusmartfoodbackend.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
 
-@Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
+@Entity
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-public class Jwt {
-    @Id
-    @Column(nullable = false)
-    private UUID id;
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+public class Jwt extends BaseEntity {
+    private Instant expirationDate;
 
-    private LocalDateTime expirationDate;
-
-    private LocalDateTime issuedDate;
+    private Instant issuedDate;
 
     @Enumerated(EnumType.STRING)
     private TokenType tokenType;

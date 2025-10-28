@@ -3,15 +3,13 @@ package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.request.PermissionAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.PermissionAdminResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.permission.PermissionService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.permission.PermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,13 +25,6 @@ public class PermissionAdminController {
                 .build();
     }
 
-    @GetMapping("/all")
-    ApiResponse<List<PermissionAdminResponse>> getAll() {
-        return ApiResponse.<List<PermissionAdminResponse>>builder()
-                .result(permissionService.getAll())
-                .build();
-    }
-
     @GetMapping
     ApiResponse<Page<PermissionAdminResponse>> getPermissionPagination(Pageable pageable) {
         return ApiResponse.<Page<PermissionAdminResponse>>builder()
@@ -41,13 +32,28 @@ public class PermissionAdminController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    ApiResponse<Void> delete(@PathVariable String id) {
-        permissionService.delete(id);
-        return ApiResponse.<Void>builder()
+    @GetMapping("/{id}")
+    ApiResponse<PermissionAdminResponse> getPermission(@PathVariable String id) {
+        return ApiResponse.<PermissionAdminResponse>builder()
+                .result(permissionService.getById(id))
+                .build();
+
+    }
+
+    @PatchMapping("/{id}")
+    ApiResponse<PermissionAdminResponse> update(@Valid @PathVariable String id, @RequestBody PermissionAdminRequest request) {
+        return ApiResponse.<PermissionAdminResponse>builder()
+                .result(permissionService.update(id, request))
                 .build();
     }
 
 
+    @DeleteMapping("/{id}")
+    ApiResponse<Void> delete(@PathVariable String id) {
+        permissionService.deleteById(id);
+        return ApiResponse.<Void>builder()
+                .message("Successfully deleted permission")
+                .build();
+    }
 
 }

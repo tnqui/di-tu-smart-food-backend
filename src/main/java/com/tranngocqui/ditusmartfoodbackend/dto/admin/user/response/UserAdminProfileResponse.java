@@ -1,9 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.user.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleWithPermissionsResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.Role;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,9 +17,6 @@ public record UserAdminProfileResponse(
         String avatarUrl,
         String language,
         Boolean twoFactorEnabled,
-        @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-        LocalDateTime createdAt,
-        Set<RoleWithPermissionsResponse> roles
-
+        Instant createdAt
 ) {
 }

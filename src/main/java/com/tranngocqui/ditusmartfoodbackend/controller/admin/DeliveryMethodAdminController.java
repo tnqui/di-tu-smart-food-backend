@@ -3,13 +3,11 @@ package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.delivery.DeliveryMethodAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.delivery.DeliveryMethodAdminResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.deliverymethod.DeliveryMethodService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.deliverymethod.DeliveryMethodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/delivery-methods")
@@ -24,17 +22,10 @@ public class DeliveryMethodAdminController {
                 .build();
     }
 
-    @PatchMapping("{name}")
+    @PatchMapping("/{id}")
     ApiResponse<DeliveryMethodAdminResponse> update(@PathVariable String id, @RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
         return ApiResponse.<DeliveryMethodAdminResponse>builder()
                 .result(deliveryMethodService.update(id, deliveryMethodAdminRequest))
-                .build();
-    }
-
-    @GetMapping("/all")
-    ApiResponse<List<DeliveryMethodAdminResponse>> getAll() {
-        return ApiResponse.<List<DeliveryMethodAdminResponse>>builder()
-                .result(deliveryMethodService.getAll())
                 .build();
     }
 
@@ -45,15 +36,18 @@ public class DeliveryMethodAdminController {
                 .build();
     }
 
-    @GetMapping("{name}")
+    @GetMapping("/{id}")
     ApiResponse<DeliveryMethodAdminResponse> get(@PathVariable String id) {
         return ApiResponse.<DeliveryMethodAdminResponse>builder()
                 .result(deliveryMethodService.get(id))
                 .build();
     }
 
-    @DeleteMapping("{id}")
-    void delete(@PathVariable String id) {
+    @DeleteMapping("/{id}")
+    ApiResponse<Void> deleteById(@PathVariable String id) {
         deliveryMethodService.delete(id);
+        return ApiResponse.<Void>builder()
+                .message("Successfully deleted the delivery method")
+                .build();
     }
 }

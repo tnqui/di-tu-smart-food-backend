@@ -5,12 +5,12 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.delivery.DeliveryMethodAdm
 import com.tranngocqui.ditusmartfoodbackend.entity.DeliveryMethod;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface DeliveryMethodMapper {
     DeliveryMethodAdminResponse toDeliveryMethodAdminResponse(DeliveryMethod deliveryMethod);
 

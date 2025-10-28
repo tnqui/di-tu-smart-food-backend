@@ -4,8 +4,6 @@ package com.tranngocqui.ditusmartfoodbackend.dto.payment;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @AllArgsConstructor

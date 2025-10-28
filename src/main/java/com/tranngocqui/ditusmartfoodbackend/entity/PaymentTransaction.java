@@ -1,33 +1,29 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
-import com.tranngocqui.ditusmartfoodbackend.enums.PaymentStatus;
 import com.tranngocqui.ditusmartfoodbackend.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.Instant;
 
-@Entity
 @Table(name = "payment_transactions")
 @Getter
 @Setter
-@RequiredArgsConstructor
-@Builder
+@Entity
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
 @AllArgsConstructor
-public class PaymentTransaction {
-    @Id
-    private UUID id;
+@Where(clause = "deleted = false")
+public class PaymentTransaction extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
-    
+
     @Enumerated(EnumType.STRING)
     private PaymentProvider provider;
 
@@ -39,43 +35,20 @@ public class PaymentTransaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    private LocalDateTime createdAt;
+    private Instant paidAt;
 
-    private LocalDateTime paidAt;
-
-    private LocalDateTime expiredAt;
+    private Instant expiredAt;
 
     @Column(columnDefinition = "TEXT")
     private String callbackData;
 
     private String errorMessage;
 
-    @PrePersist
+    @Override
     public void prePersist() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
+        super.prePersist();
         if (status == null) {
             status = TransactionStatus.PENDING;
         }
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        PaymentTransaction that = (PaymentTransaction) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

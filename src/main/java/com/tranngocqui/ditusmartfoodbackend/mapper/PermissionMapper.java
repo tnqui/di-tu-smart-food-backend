@@ -4,19 +4,21 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.request.Permiss
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.PermissionAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Permission;
 import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.data.domain.Page;
 
-@Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PermissionMapper {
     Permission toPermission(PermissionAdminRequest permissionRequest);
-    PermissionAdminResponse toPermissionResponse(Permission permission);
 
-    default Page<PermissionAdminResponse> toPermissionResponsePagination(Page<Permission> permissions){
-        return permissions.map(this::toPermissionResponse);
+    PermissionAdminResponse toPermissionAdminResponse(Permission permission);
+
+    void update(PermissionAdminRequest request, @MappingTarget Permission permission);
+
+    default Page<PermissionAdminResponse> toPermissionResponsePagination(Page<Permission> permissions) {
+        return permissions.map(this::toPermissionAdminResponse);
     }
-
-
-
 
 }

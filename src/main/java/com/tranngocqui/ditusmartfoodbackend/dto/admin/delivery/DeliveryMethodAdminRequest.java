@@ -1,22 +1,23 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.delivery;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethodProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryMethodAdminRequest {
-    private String name;
+    private DeliveryMethodProvider shortName;
 
-    private String description;
+    private String fullName;
 
     private Integer time;
 
-    private Double price;
+    private BigDecimal price;
 }

@@ -1,43 +1,36 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
-@Table(name = "order_items", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "menu_item_id"}))
-public class OrderItem {
-    @Id
-    private UUID id;
+@Entity
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_item_id")
-    private MenuItem menuItem;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    // @NotNull
-    // @Column(nullable = false)
     private Integer quantity;
 
-    // @Column(name = "price_at_order_time", precision = 10, scale = 2, nullable = false)
-    // @NotNull
-    private BigDecimal priceAtOrderTime;
+    private BigDecimal priceAtOrderedTime;
 
-    @PrePersist
-    public void prePersist() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-    }
+    @Column(columnDefinition = "TEXT")
+    private String note;
 }

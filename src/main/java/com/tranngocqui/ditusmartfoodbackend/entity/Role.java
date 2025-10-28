@@ -1,34 +1,25 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
+import com.tranngocqui.ditusmartfoodbackend.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@Builder
+@Entity
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-public class Role {
-    @Id
-    private UUID id;
-    private String name;
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+public class Role extends BaseEntity {
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
     private String description;
-    private LocalDateTime createdAt;
 
     @ManyToMany
     private Set<Permission> permissions;
-
-    @PrePersist
-    public void prePersist() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-    }
 }

@@ -1,24 +1,27 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
 import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
 
-@Entity
 @Getter
 @Setter
+@Entity
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Where(clause = "deleted = false")
 @Table(name = "notifications")
-public class Notification {
-    @Id
-    private UUID id;
-
+public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", columnDefinition = "UUID")
     private User user;
@@ -43,17 +46,13 @@ public class Notification {
     private String redirectUrl;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "read_at")
-    private LocalDateTime readAt;
+    private Instant readAt;
 
-    @PrePersist
-    protected void onCreate() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-        this.createdAt = LocalDateTime.now();
+    public void prePersist() {
+        super.prePersist();
         if (this.type == null) {
             this.type = NotificationType.ORDER;
         }
@@ -64,7 +63,7 @@ public class Notification {
 
     public void markAsRead() {
         this.status = NotificationStatus.READ;
-        this.readAt = LocalDateTime.now();
+        this.readAt = Instant.now();
     }
 
 }

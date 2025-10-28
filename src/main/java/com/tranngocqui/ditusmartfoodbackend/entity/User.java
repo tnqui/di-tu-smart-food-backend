@@ -3,10 +3,9 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +16,7 @@ import java.util.Set;
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLRestriction("deleted = false")
-@SQLDelete(sql = "UPDATE users SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?::uuid")
+@Where(clause = "deleted = false")
 @Table(name = "users")
 public class User extends BaseEntity {
     private String fullName;
@@ -39,7 +37,7 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer loginAttempts = 0;
 
-    private LocalDateTime lastLoginAt;
+    private Instant lastLoginAt;
 
     private String lastLoginIp;
 
@@ -55,9 +53,11 @@ public class User extends BaseEntity {
     private Boolean twoFactorEnabled = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Jwt> jwts = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -6,9 +6,9 @@ import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentWebhookResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.PaymentTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PaymentTransactionMapper {
 
 

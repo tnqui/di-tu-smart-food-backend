@@ -2,9 +2,8 @@ package com.tranngocqui.ditusmartfoodbackend.dto.admin.user.request;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 
 public record UserAdminRequest(
         String fullName,
@@ -16,7 +15,7 @@ public record UserAdminRequest(
         Boolean isPhoneVerified,
         boolean enabled,
         Boolean accountStatus,
-        LocalDateTime lastLoginAt,
+        Instant lastLoginAt,
         String lastLoginIp,
         String avatarUrl,
         String language,

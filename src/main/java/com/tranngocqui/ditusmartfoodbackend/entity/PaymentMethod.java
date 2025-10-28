@@ -1,32 +1,22 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
+import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethodProvider;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-@Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class PaymentMethod {
-    @Id
-    private UUID id;
+@Entity
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Where(clause = "deleted = false")
+public class PaymentMethod extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private PaymentProvider name;
-
-    private String description;
-
-    @PrePersist
-    public void prePersist() {
-        if (id == null) {
-            id = Generators.timeBasedEpochRandomGenerator().generate();
-        }
-    }
+    private PaymentMethodProvider shortName;
+    private String fullName;
 }
