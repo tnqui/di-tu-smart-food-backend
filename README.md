@@ -10,11 +10,21 @@ spring:
   application:
     name: di-tu-smart-food-backend
 
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
+
+    redis:
+      host: localhost
+      port: 6379
+
   mail:
     host: smtp.gmail.com
-    port: 
-    username: 
-    password: 
+    port:
+    username:
+    password:
     properties:
       mail:
         smtp:
@@ -25,57 +35,58 @@ spring:
             trust: smtp.gmail.com
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/...
-    username: ...
-    password: ...
+    url:
+    username:
+    password:
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop #validate for production
+      ddl-auto: update # validate for production
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-    open-in-view: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   security:
     jwt:
       issuer: "Di4food.com"
-      secret: ""
+      secret:
       expiration: 3600000
       refresh-expiration: 1209600000
 
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id:
-            client-secret:
-            scope:
-            redirect-uri:
-        provider:
-          google:
-            authorization-uri: 
-            token-uri:
-            user-info-uri: 
-            user-name-attribute: 
+#  oauth2:
+#    client:
+#      registration:
+#        google:
+#          client-id:
+#          client-secret:
+#          scope:
+#          redirect-uri:
+#      provider:
+#        google:
+#          authorization-uri:
+#          token-uri:
+#          user-info-uri:
+#          user-name-attribute:
 
-  flyway:
-    enabled: false #true for production
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    validate-on-migrate: true
+flyway:
+  enabled: false # true for production
+  locations: classpath:db/migration
+  baseline-on-migrate: true
+  validate-on-migrate: true
 
-  cloudflare:
-    r2:
-      end-point:
-      access-key:
-      secret-key: 
-      bucket:
+cloudflare:
+  r2:
+    end-point:
+    access-key:
+    secret-key:
+    bucket:
 
 mapbox:
-  token: 
+  token:
 
 app:
   name: DiTuSmartFood
@@ -83,16 +94,15 @@ app:
     algorithm: SHA1
     digits: 6
     period: 30
-  debug: true
+    debug: true
 
 momo:
-  partner-code: 
-  access-key: 
-  secret-key: 
-  public-key: 
-  endpoint:
-
-
-
-
+  partner-code:
+  access-key:
+  secret-key:
+  callback-url: "/"
+  redirect-url: "/"
+  request-type: captureWallet
+  public-key:
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
 ```
