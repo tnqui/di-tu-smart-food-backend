@@ -2,186 +2,38 @@ package com.tranngocqui.ditusmartfoodbackend.exception;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.NoHandlerFoundException;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    @Value("${app.debug:false}")
-    private boolean debugMode;
-
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<Object> handleApiException(ApiException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", ex.getStatus().value());
-        body.put("error", ex.getStatus().getReasonPhrase());
-        body.put("message", ex.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity.status(ex.getStatus()).body(body);
-    }
-
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handleRuntimeException(Exception ex) {
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<String> handleNullPointerException(NullPointerException ex) {
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Có lỗi xảy ra: dữ liệu không tồn tại");
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex
-            , HttpServletRequest request) {
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .code(ErrorCode.REQUIRED_FIELD_MISSING.getCode())
-                .message(ErrorCode.REQUIRED_FIELD_MISSING.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(response);
-    }
-
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<ApiResponse> handleAppException(AppException ex) {
+    public ResponseEntity<ApiResponse<?>> handleApiException(AppException e) {
+        ErrorCode errorCode = e.getErrorCode();
 
-        HttpStatus status = (ex.getErrorCode() == ErrorCode.UNAUTHORIZED)
-                ? HttpStatus.UNAUTHORIZED
-                : HttpStatus.BAD_REQUEST;
-
-        ErrorCode errorCode = ex.getErrorCode();
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity.status(status).body(apiResponse);
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), errorCode.getMessage()));
     }
 
-
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-
-        String enumKey = ex.getFieldErrors().getFirst().getDefaultMessage();
-        ErrorCode errorCode = ErrorCode.INVALID_MESSAGE_KEY;
-
-        try {
-            errorCode = ErrorCode.valueOf(enumKey);
-        } catch (IllegalArgumentException e) {
-
-        }
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
-
-    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    ResponseEntity<ApiResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
-        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<ApiResponse<?>> handleRedisConnectionFailureException(RedisConnectionFailureException e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.error(HttpStatus.SERVICE_UNAVAILABLE.value(), e.getMessage()));
     }
 
-    @ExceptionHandler(value = NoHandlerFoundException.class)
-    ResponseEntity<ApiResponse> handleNoHandlerFoundException(NoHandlerFoundException ex) {
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(ErrorCode.NOT_FOUND.getCode());
-
-        apiResponse.setMessage(ErrorCode.NOT_FOUND.getMessage());
-
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        return ResponseEntity.internalServerError().body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Server Error"));
     }
 
-    @ExceptionHandler(Throwable.class)
-    ResponseEntity<ApiResponse> handleAll(Throwable ex) {
-        logger.error("Unexpected error", ex);
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
-        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
-        return ResponseEntity.status(500).body(apiResponse);
-    }
-
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    ResponseEntity<ApiResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(ErrorCode.SOMETHING_WENT_WRONG.getCode());
-        apiResponse.setMessage(ErrorCode.SOMETHING_WENT_WRONG.getMessage());
-        if (debugMode) {
-            logger.error("Exception caught", ex);
-        }
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
 }

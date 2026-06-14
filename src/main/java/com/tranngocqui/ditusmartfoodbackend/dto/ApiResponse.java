@@ -1,24 +1,56 @@
 package com.tranngocqui.ditusmartfoodbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
-    @Builder.Default
-    private int code = 1000;
-    private String message;
-    private T result;
-
-    public ApiResponse(int code, String invalidOrExpiredToken) {
+public record ApiResponse<T>(
+        int status,
+        boolean success,
+        String message,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        T data,
+        Instant timestamp
+) {
+    public static <T> ApiResponse<T> success(T data) {
+        return ApiResponse.<T>builder()
+                .status(200)
+                .success(true)
+                .message("Success")
+                .data(data)
+                .timestamp(Instant.now())
+                .build();
     }
+
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return ApiResponse.<T>builder()
+                .status(200)
+                .success(true)
+                .message(message)
+                .data(data)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> success(String message) {
+        return ApiResponse.<T>builder()
+                .status(200)
+                .success(true)
+                .message(message)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> error(int status, String message) {
+        return ApiResponse.<T>builder()
+                .status(status)
+                .success(false)
+                .message(message)
+                .timestamp(Instant.now())
+                .build();
+    }
+
 }

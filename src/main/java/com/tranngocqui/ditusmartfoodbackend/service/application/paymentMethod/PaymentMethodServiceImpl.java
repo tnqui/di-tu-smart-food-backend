@@ -5,17 +5,12 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.paymentmethod.PaymentMetho
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.paymentmethod.PaymentMethodAdminUpdateRequest;
 import com.tranngocqui.ditusmartfoodbackend.entity.PaymentMethod;
 import com.tranngocqui.ditusmartfoodbackend.mapper.PaymentMethodMapper;
-import com.tranngocqui.ditusmartfoodbackend.repository.PaymentMethodRepository;
-import com.tranngocqui.ditusmartfoodbackend.service.BaseService;
 import com.tranngocqui.ditusmartfoodbackend.service.domain.paymentmethod.PaymentMethodDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Slf4j
 @Service

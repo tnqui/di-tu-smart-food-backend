@@ -5,91 +5,74 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminRespon
 import com.tranngocqui.ditusmartfoodbackend.dto.external.GeocodeResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Address;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.AddressMapper;
-import com.tranngocqui.ditusmartfoodbackend.repository.AddressRepository;
-import com.tranngocqui.ditusmartfoodbackend.service.GeocodingService;
+import com.tranngocqui.ditusmartfoodbackend.service.external.GeocodingService;
+import com.tranngocqui.ditusmartfoodbackend.service.domain.address.AddressDomainService;
 import com.tranngocqui.ditusmartfoodbackend.service.domain.user.UserDomainService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AddressServiceImpl implements AddressService {
-    private final AddressRepository addressRepository;
-    private final AddressMapper addressMapper;
-    private final UserDomainService userDomainService;
-    private final GeocodingService geocodingService;
+    AddressDomainService addressDomainService;
+    AddressMapper addressMapper;
+    UserDomainService userDomainService;
+    GeocodingService geocodingService;
+
 
     @Override
     public AddressAdminResponse create(AddressAdminRequest request) {
-        User user = userDomainService.getByIdOrThrow(request.getUserId());
-
+        User user = userDomainService.getByIdOrThrow(request.userId());
         Address address = addressMapper.toAddress(request);
 
+        String fullAddress = request.buildFullAddress();
+
         address.setUser(user);
+        address.setFullAddress(request.buildFullAddress());
 
-        geocodingService.geocode(request.getFullAddress());
+        GeocodeResponse response = geocodingService.geocode(fullAddress);
 
-        try {
-            GeocodeResponse geocodeResponse = geocodingService.geocode(request.getFullAddress());
+        address.setLongitude(response.longitude());
 
-            address.setLongitude(geocodeResponse.getLongitude());
-            address.setLatitude(geocodeResponse.getLatitude());
-        } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.ILLEGAL_ARGUMENTS);
-        } catch (Exception e) {
-            throw new AppException(ErrorCode.MAPBOX_ERROR);
-        }
+        address.setLatitude(response.latitude());
 
-        AddressAdminResponse response = addressMapper.toAddressAdminResponse(addressRepository.save(address));
+        address.setGeocodeMatchedAddress(response.matchedAddress());
 
-        response.setUserId(user.getId());
-
-        return response;
+        return addressMapper.toAddressAdminResponse(addressDomainService.createAddress(address));
     }
 
     @Override
     public AddressAdminResponse update(String id, AddressAdminRequest request) {
-
-        Address address = addressRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
-
-        // Cập nhật các field từ request vào address
-        addressMapper.update(request, address);
-
-        if (request.getUserId() != null) {
-            User user = userDomainService.getByIdOrThrow(request.getUserId());
-            address.setUser(user);
-        }
-
-        Address savedAddress = addressRepository.save(address);
-
-        return addressMapper.toAddressAdminResponse(savedAddress);
+        return null;
     }
-
 
     @Override
     public void delete(String id) {
-        addressRepository.deleteById(UUID.fromString(id));
+
     }
 
     @Override
     public AddressAdminResponse get(String id) {
-        Address address = addressRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
-
-        return addressMapper.toAddressAdminResponse(address);
+        return null;
     }
 
     @Override
     public Page<AddressAdminResponse> getPagination(Pageable pageable) {
-        return addressMapper.toAddressAdminResponsePage(addressRepository.findAll(pageable));
+        return null;
+    }
+
+    @Override
+    public List<AddressAdminResponse> getByUserId(String userId) {
+        return addressDomainService.getAddressByUserId(userId).stream().map(addressMapper::toAddressAdminResponse).collect(Collectors.toList());
     }
 
 }

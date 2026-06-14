@@ -1,44 +1,50 @@
 package com.tranngocqui.ditusmartfoodbackend.service.domain.deliverymethod;
 
 import com.tranngocqui.ditusmartfoodbackend.entity.DeliveryMethod;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethodProvider;
+import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
+import com.tranngocqui.ditusmartfoodbackend.repository.DeliveryMethodRepository;
 import com.tranngocqui.ditusmartfoodbackend.service.BaseService;
+import com.tranngocqui.ditusmartfoodbackend.service.BaseServiceFactory;
 import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
-public class DeliveryMethodDomainServiceImpl extends BaseService<DeliveryMethod, UUID> implements DeliveryMethodDomainService {
-    public DeliveryMethodDomainServiceImpl(JpaRepository<DeliveryMethod, UUID> repository) {
-        super(repository);
-    }
+public class DeliveryMethodDomainServiceImpl implements DeliveryMethodDomainService {
+    private final BaseService<DeliveryMethod, UUID> baseService;
+    private final DeliveryMethodRepository deliveryMethodRepository;
 
-    @Override
-    protected ErrorCode getNotFoundErrorCode() {
-        return ErrorCode.DELIVERY_METHOD_NOT_FOUND;
+    public DeliveryMethodDomainServiceImpl(BaseServiceFactory factory, DeliveryMethodRepository deliveryMethodRepository) {
+        this.baseService = factory.create(deliveryMethodRepository);
+        this.deliveryMethodRepository = deliveryMethodRepository;
     }
 
     @Override
     public DeliveryMethod getByIdOrThrow(String id) {
-        return findByIdOrThrow(UUIDUtils.parseUUUIDFromString(id));
+        return baseService.findByIdOrThrow(UUIDUtils.parseUUUIDFromString(id));
+    }
+
+    @Override
+    public DeliveryMethod getByCodeOrThrow(DeliveryMethodProvider code) {
+        return deliveryMethodRepository.findOptionalByCode(code).orElseThrow(() -> new AppException(baseService.getNotFoundErrorCode()));
     }
 
     @Override
     public DeliveryMethod createDeliveryMethod(DeliveryMethod deliveryMethod) {
-        return save(deliveryMethod);
+        return baseService.save(deliveryMethod);
     }
 
     @Override
     public void deleteDeliveryMethodById(String id) {
-        deleteById(UUIDUtils.parseUUUIDFromString(id));
+        baseService.deleteById(UUIDUtils.parseUUUIDFromString(id));
     }
 
     @Override
     public Page<DeliveryMethod> getDeliveryMethods(Pageable pageable) {
-        return findAll(pageable);
+        return baseService.findAll(pageable);
     }
 }

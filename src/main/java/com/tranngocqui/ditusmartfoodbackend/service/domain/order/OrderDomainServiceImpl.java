@@ -1,52 +1,48 @@
 package com.tranngocqui.ditusmartfoodbackend.service.domain.order;
 
 import com.tranngocqui.ditusmartfoodbackend.entity.Order;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.repository.OrderRepository;
 import com.tranngocqui.ditusmartfoodbackend.service.BaseService;
+import com.tranngocqui.ditusmartfoodbackend.service.BaseServiceFactory;
 import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class OrderDomainServiceImpl extends BaseService<Order, UUID> implements OrderDomainService {
-    public OrderDomainServiceImpl(JpaRepository<Order, UUID> repository) {
-        super(repository);
-    }
+public class OrderDomainServiceImpl implements OrderDomainService {
+    private final BaseService<Order, UUID> baseService;
 
-    @Override
-    protected ErrorCode getNotFoundErrorCode() {
-        return ErrorCode.ORDER_NOT_FOUND;
+    public OrderDomainServiceImpl(BaseServiceFactory baseServiceFactory, OrderRepository orderRepository) {
+        this.baseService = baseServiceFactory.create(orderRepository);
     }
-
 
     @Override
     public Order getByIdOrThrow(String id) {
-        return findByIdOrThrow(UUIDUtils.parseUUUIDFromString(id));
+        return baseService.findByIdOrThrow(UUIDUtils.parseUUUIDFromString(id));
     }
 
     @Override
     public Order getByIdOrNull(String id) {
-        return findOptionalById(UUIDUtils.parseUUUIDFromString(id)).orElse(null);
+        return baseService.findOptionalById(UUIDUtils.parseUUUIDFromString(id)).orElse(null);
     }
 
     @Override
     public Page<Order> getOrders(Pageable pageable) {
-        return findAll(pageable);
+        return baseService.findAll(pageable);
     }
 
     @Override
     public void deleteOrderById(String id) {
-        deleteById(UUIDUtils.parseUUUIDFromString(id));
+        baseService.deleteById(UUIDUtils.parseUUUIDFromString(id));
     }
 
     @Override
     public Order createOrder(Order order) {
-        return save(order);
+        return baseService.save(order);
     }
 
     @Override

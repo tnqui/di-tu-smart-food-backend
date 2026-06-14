@@ -2,10 +2,8 @@ package com.tranngocqui.ditusmartfoodbackend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
+import com.tranngocqui.ditusmartfoodbackend.configuration.SecurityConfig;
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
 import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtService;
 import jakarta.servlet.FilterChain;
@@ -57,8 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (!jwtService.validateAccessToken(token)) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json;charset=UTF-8");
-                    new ObjectMapper().writeValue(response.getOutputStream(),
-                            new ApiResponse<>(ErrorCode.UNAUTHENTICATED.getCode(), ErrorCode.UNAUTHENTICATED.getMessage()));
                     return;
                 }
 
@@ -104,16 +100,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                  String detail) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(status.value());
-        ApiResponse<AppException> apiResponse = ApiResponse.<AppException>builder()
-                .code(status.value())
-                .message(message)
-                .build();
+//        ApiResponse<AppException> apiResponse = ApiResponse.<AppException>builder()
+//                .code(status.value())
+//                .message(message)
+//                .build();
 
         log.warn(detail);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        response.getWriter().write(mapper.writeValueAsString(apiResponse));
+//        response.getWriter().write(mapper.writeValueAsString(apiResponse));
     }
 
 //    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {

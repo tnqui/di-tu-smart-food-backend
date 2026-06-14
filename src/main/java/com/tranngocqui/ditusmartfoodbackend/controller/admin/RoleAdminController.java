@@ -7,6 +7,7 @@ import com.tranngocqui.ditusmartfoodbackend.service.application.role.RoleService
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,40 +15,29 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RoleAdminController {
     private final RoleService roleService;
-
     @GetMapping()
-    ApiResponse<Page<RoleAdminResponse>> getAll(Pageable pageable) {
-        return ApiResponse.<Page<RoleAdminResponse>>builder()
-                .result(roleService.getAll(pageable))
-                .build();
+    public ResponseEntity<ApiResponse<Page<RoleAdminResponse>>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(roleService.getAll(pageable)));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<RoleAdminResponse> getById(@PathVariable String id) {
-        return ApiResponse.<RoleAdminResponse>builder()
-                .result(roleService.getById(id))
-                .build();
+    public ResponseEntity<ApiResponse<RoleAdminResponse>> getById(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success(roleService.getById(id)));
     }
 
     @PostMapping
-    ApiResponse<RoleAdminResponse> create(@RequestBody RoleAdminRequest request) {
-        return ApiResponse.<RoleAdminResponse>builder()
-                .result(roleService.create(request))
-                .build();
+    public ResponseEntity<ApiResponse<RoleAdminResponse>> create(@RequestBody RoleAdminRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(roleService.create(request)));
     }
 
     @PatchMapping("/{id}")
-    ApiResponse<RoleAdminResponse> update(@PathVariable String id, @RequestBody RoleAdminRequest request) {
-        return ApiResponse.<RoleAdminResponse>builder()
-                .result(roleService.update(id, request))
-                .build();
+    public ResponseEntity<ApiResponse<RoleAdminResponse>> update(@PathVariable String id, @RequestBody RoleAdminRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(roleService.update(id, request)));
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<Void> delete(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         roleService.deleteById(id);
-        return ApiResponse.<Void>builder()
-                .message("Successfully deleted role")
-                .build();
+        return ResponseEntity.ok(ApiResponse.success("Successfully deleted role"));
     }
 }

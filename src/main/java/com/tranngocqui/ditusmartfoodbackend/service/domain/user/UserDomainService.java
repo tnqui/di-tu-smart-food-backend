@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface UserDomainService {
 
     User getByIdOrThrow(String id);
+
     Optional<User> findOptionalById(String id);
 
     Page<User> getUsers(Pageable pageable);

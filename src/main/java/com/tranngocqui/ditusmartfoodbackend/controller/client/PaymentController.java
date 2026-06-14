@@ -3,7 +3,11 @@ package com.tranngocqui.ditusmartfoodbackend.controller.client;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.application.paymenttransaction.factory.PaymentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -14,10 +18,8 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/{orderId}")
-    public ApiResponse<?> pay(@PathVariable String orderId) throws Exception {
-        return ApiResponse.builder()
-                .result(paymentService.processPayment(orderId))
-                .build();
+    public ResponseEntity<ApiResponse<?>> pay(@PathVariable String orderId) throws Exception {
+        return ResponseEntity.ok(ApiResponse.success(paymentService.processPayment(orderId)));
     }
 
 }

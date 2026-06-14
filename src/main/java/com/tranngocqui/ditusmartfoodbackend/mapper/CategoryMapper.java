@@ -20,6 +20,9 @@ public interface CategoryMapper {
 
     List<CategoryClientResponse> toCategoryClientResponse(List<Category> category);
 
+    CategoryClientResponse toCategoryClientResponse(Category category);
+
+
     default Page<CategoryAdminResponse> toCategoryAdminResponses(Page<Category> categoryPage) {
         return categoryPage.map(this::toCategoryAdminResponse);
     }

@@ -1,9 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,11 +23,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
-        ApiResponse<AppException> apiResponse = ApiResponse.<AppException>builder()
-                .code(ErrorCode.UNAUTHORIZED.getCode())
-                .message(ErrorCode.UNAUTHORIZED.getMessage())
-                .build();
-
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+//        ApiResponse<AppException> apiResponse = ApiResponse.<AppException>builder()
+//                .code(ErrorCode.UNAUTHORIZED.getCode())
+//                .message(ErrorCode.UNAUTHORIZED.getMessage())
+//                .build();
+//
+//        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }

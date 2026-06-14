@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -19,41 +20,29 @@ public class PermissionAdminController {
     private final PermissionService permissionService;
 
     @PostMapping
-    ApiResponse<PermissionAdminResponse> create(@Valid @RequestBody PermissionAdminRequest request) {
-        return ApiResponse.<PermissionAdminResponse>builder()
-                .result(permissionService.create(request))
-                .build();
+    public ResponseEntity<ApiResponse<PermissionAdminResponse>> create(@Valid @RequestBody PermissionAdminRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(permissionService.create(request)));
     }
 
     @GetMapping
-    ApiResponse<Page<PermissionAdminResponse>> getPermissionPagination(Pageable pageable) {
-        return ApiResponse.<Page<PermissionAdminResponse>>builder()
-                .result(permissionService.getPermissionPagination(pageable))
-                .build();
+    public ResponseEntity<ApiResponse<Page<PermissionAdminResponse>>> getPermissionPagination(Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(permissionService.getPermissionPagination(pageable)));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<PermissionAdminResponse> getPermission(@PathVariable String id) {
-        return ApiResponse.<PermissionAdminResponse>builder()
-                .result(permissionService.getById(id))
-                .build();
-
+    public ResponseEntity<ApiResponse<PermissionAdminResponse>> getPermission(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success(permissionService.getById(id)));
     }
 
     @PatchMapping("/{id}")
-    ApiResponse<PermissionAdminResponse> update(@Valid @PathVariable String id, @RequestBody PermissionAdminRequest request) {
-        return ApiResponse.<PermissionAdminResponse>builder()
-                .result(permissionService.update(id, request))
-                .build();
+    public ResponseEntity<ApiResponse<PermissionAdminResponse>> update(@PathVariable String id, @Valid @RequestBody PermissionAdminRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(permissionService.update(id, request)));
     }
 
-
     @DeleteMapping("/{id}")
-    ApiResponse<Void> delete(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         permissionService.deleteById(id);
-        return ApiResponse.<Void>builder()
-                .message("Successfully deleted permission")
-                .build();
+        return ResponseEntity.ok(ApiResponse.success("Successfully deleted permission"));
     }
 
 }

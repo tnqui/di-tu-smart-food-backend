@@ -17,6 +17,6 @@ import org.hibernate.annotations.Where;
 public class PaymentMethod extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethodProvider shortName;
+    private PaymentMethodProvider code;
     private String fullName;
 }

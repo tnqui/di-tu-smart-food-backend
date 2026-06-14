@@ -3,8 +3,8 @@ package com.tranngocqui.ditusmartfoodbackend.service.application.role;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.request.RoleAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response.RoleAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Role;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.mapper.RoleMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.PermissionRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.RoleRepository;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
@@ -50,7 +49,6 @@ public class RoleServiceImpl implements RoleService {
             role.setPermissions(new HashSet<>(permissions));
 
         }
-
         return roleMapper.toRoleAdminResponse(roleRepository.save(role));
 
     }

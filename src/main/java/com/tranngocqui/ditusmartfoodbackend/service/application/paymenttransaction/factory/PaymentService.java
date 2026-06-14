@@ -1,18 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.service.application.paymenttransaction.factory;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.Order;
-import com.tranngocqui.ditusmartfoodbackend.entity.PaymentTransaction;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
-import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
-import com.tranngocqui.ditusmartfoodbackend.enums.TransactionStatus;
-import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.repository.OrderRepository;
 import com.tranngocqui.ditusmartfoodbackend.repository.PaymentTransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class PaymentService {

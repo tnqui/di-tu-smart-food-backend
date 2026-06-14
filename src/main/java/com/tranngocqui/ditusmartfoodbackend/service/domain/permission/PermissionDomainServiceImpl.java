@@ -1,44 +1,40 @@
 package com.tranngocqui.ditusmartfoodbackend.service.domain.permission;
 
 import com.tranngocqui.ditusmartfoodbackend.entity.Permission;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.repository.PermissionRepository;
 import com.tranngocqui.ditusmartfoodbackend.service.BaseService;
+import com.tranngocqui.ditusmartfoodbackend.service.BaseServiceFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
-public class PermissionDomainServiceImpl extends BaseService<Permission, UUID> implements PermissionDomainService {
-    public PermissionDomainServiceImpl(JpaRepository<Permission, UUID> repository) {
-        super(repository);
-    }
+public class PermissionDomainServiceImpl implements PermissionDomainService {
+    private final BaseService<Permission, UUID> baseService;
 
-    @Override
-    protected ErrorCode getNotFoundErrorCode() {
-        return ErrorCode.PERMISSION_NOT_FOUND;
+    public PermissionDomainServiceImpl(BaseServiceFactory factory, PermissionRepository PermissionRepository) {
+        this.baseService = factory.create(PermissionRepository);
     }
-
 
     @Override
     public Permission getByIdOrThrow(String id) {
-        return findByIdOrThrow(UUID.fromString(id));
+        return baseService.findByIdOrThrow(UUID.fromString(id));
     }
 
     @Override
     public Page<Permission> getPermissions(Pageable pageable) {
-        return findAll(pageable);
+        return baseService.findAll(pageable);
     }
 
     @Override
     public void deletePermissionById(String id) {
-        deleteById(UUID.fromString(id));
+        baseService.deleteById(UUID.fromString(id));
     }
 
     @Override
     public Permission createPermission(Permission permission) {
-        return save(permission);
+        return baseService.save(permission);
     }
 }

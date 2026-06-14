@@ -8,7 +8,6 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,6 +19,9 @@ import java.util.List;
 @Where(clause = "deleted = false")
 @Table(name = "orders")
 public class Order extends BaseEntity {
+
+    private String orderId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

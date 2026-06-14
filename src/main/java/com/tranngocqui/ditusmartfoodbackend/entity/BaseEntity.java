@@ -1,6 +1,5 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.fasterxml.uuid.Generators;
 import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import jakarta.persistence.*;
 import lombok.*;

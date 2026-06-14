@@ -1,14 +1,13 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration;
 
+import com.tranngocqui.ditusmartfoodbackend.security.CustomAccessDeniedHandler;
+import com.tranngocqui.ditusmartfoodbackend.security.CustomAuthenticationEntryPoint;
+import com.tranngocqui.ditusmartfoodbackend.security.JwtAuthenticationFilter;
+import com.tranngocqui.ditusmartfoodbackend.security.TwoFactorAuthenticationProvider;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,12 +17,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.io.IOException;
 import java.util.List;
 
 @Configuration
@@ -31,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    protected static final String[] PUBLIC_ENDPOINTS = {
+    public static final String[] PUBLIC_ENDPOINTS = {
             "/test/**",
             "/api/payment/momo/**",
             "/api/orders/**",

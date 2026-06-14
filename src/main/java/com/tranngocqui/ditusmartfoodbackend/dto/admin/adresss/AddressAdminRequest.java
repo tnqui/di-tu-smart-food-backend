@@ -1,19 +1,22 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class AddressAdminRequest {
-    private String label;
-    private String fullAddress;
-    private boolean defaultAddress;
-    private String userId;
+public record AddressAdminRequest(
+        String userId,
+        String houseNumber,
+        String street,
+        String ward,
+        String district,
+        String city,
+        String country,
+        Boolean isDefault
+) {
+    public String buildFullAddress() {
+        return Stream.of(street, ward, district, city, country).filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.joining(", "));
+    }
+
 }

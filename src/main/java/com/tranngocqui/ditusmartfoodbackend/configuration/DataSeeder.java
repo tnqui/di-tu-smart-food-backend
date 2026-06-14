@@ -8,6 +8,7 @@ import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethodProvider;
 import com.tranngocqui.ditusmartfoodbackend.enums.RoleEnum;
 import com.tranngocqui.ditusmartfoodbackend.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +20,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DataSeeder implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
-    private final ItemRepository menuItemRepository;
+    private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -33,12 +35,12 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Kiểm tra nếu database đã có dữ liệu thì không seed
-        if (categoryRepository.count() > 0 || menuItemRepository.count() > 0) {
-            System.out.println("Database already has data. Skipping seeding.");
+        if (categoryRepository.count() > 0 || productRepository.count() > 0) {
+            log.info("Database already has data. Skipping seeding.");
             return;
         }
 
-        System.out.println("Database is empty. Starting data seeding...");
+        log.info("Database is empty. Starting data seeding...");
 
         // 1. Tạo category với ảnh minh họa
         Map<String, String> categoryData = Map.of(
@@ -154,7 +156,7 @@ public class DataSeeder implements CommandLineRunner {
 
             for (MenuItemData itemData : entry.getValue()) {
                 for (int i = 1; i <= repeatCount; i++) {
-                    Item menuItem = new Item();
+                    Product menuItem = new Product();
                     String suffix = " #" + i;
 
                     menuItem.setName(itemData.name + suffix);
@@ -198,7 +200,7 @@ public class DataSeeder implements CommandLineRunner {
                     menuItem.setPrimaryCategory(category);
                     menuItem.setCategories(Set.of(category));
 
-                    menuItemRepository.save(menuItem);
+                    productRepository.save(menuItem);
                 }
             }
         }
@@ -218,13 +220,13 @@ public class DataSeeder implements CommandLineRunner {
                 .build());
 
         DeliveryMethod deliveryMethod = deliveryMethodRepository.save(DeliveryMethod.builder()
-                .shortName(DeliveryMethodProvider.IN_HOUSE)
+                .code(DeliveryMethodProvider.IN_HOUSE)
                 .fullName(DeliveryMethodProvider.IN_HOUSE.getFullName())
                 .pricePerKm(BigDecimal.valueOf(30000))
                 .build());
 
         PaymentMethod paymentMethod = paymentMethodRepository.save(PaymentMethod.builder()
-                .shortName(PaymentMethodProvider.COD)
+                .code(PaymentMethodProvider.COD)
                 .fullName(PaymentMethodProvider.COD.getFullName())
                 .build());
 

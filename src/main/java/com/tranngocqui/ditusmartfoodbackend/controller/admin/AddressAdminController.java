@@ -5,9 +5,10 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminReques
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.application.address.AddressService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/addresses")
@@ -15,38 +16,44 @@ import org.springframework.web.bind.annotation.*;
 public class AddressAdminController {
     private final AddressService addressService;
 
+    @GetMapping("{userId}")
+    public ResponseEntity<ApiResponse<List<AddressAdminResponse>>> getAddressByUserId(@PathVariable String userId) {
+        return ResponseEntity.ok(ApiResponse.success(addressService.getByUserId(userId)));
+    }
+
+
     @PostMapping
-    ApiResponse<AddressAdminResponse> create(@RequestBody AddressAdminRequest addressAdminRequest) {
-        return ApiResponse.<AddressAdminResponse>builder()
-                .result(addressService.create(addressAdminRequest))
-                .build();
-    }
-
-    @GetMapping("{id}")
-    ApiResponse<AddressAdminResponse> get(@PathVariable String id) {
-        return ApiResponse.<AddressAdminResponse>builder()
-                .result(addressService.get(id))
-                .build();
-    }
-
-    @GetMapping()
-    ApiResponse<Page<AddressAdminResponse>> getPagination(Pageable pageable) {
-        return ApiResponse.<Page<AddressAdminResponse>>builder()
-                .result(addressService.getPagination(pageable))
-                .build();
+    ResponseEntity<ApiResponse<AddressAdminResponse>> create(@RequestBody AddressAdminRequest addressAdminRequest) {
+        return ResponseEntity.ok(ApiResponse.success(addressService.create(addressAdminRequest)));
     }
 
 
-    @PatchMapping("{id}")
-    ApiResponse<AddressAdminResponse> update(@PathVariable String id, @RequestBody AddressAdminRequest request) {
-        return ApiResponse.<AddressAdminResponse>builder()
-                .result(addressService.update(id, request))
-                .build();
-    }
-
-    @DeleteMapping("{id}")
-    void delete(@PathVariable String id) {
-        addressService.delete(id);
-    }
+//
+//    @GetMapping("{id}")
+//    ApiResponse<AddressAdminResponse> get(@PathVariable String id) {
+//        return ApiResponse.<AddressAdminResponse>builder()
+//                .result(addressService.get(id))
+//                .build();
+//    }
+//
+//    @GetMapping()
+//    ApiResponse<Page<AddressAdminResponse>> getPagination(Pageable pageable) {
+//        return ApiResponse.<Page<AddressAdminResponse>>builder()
+//                .result(addressService.getPagination(pageable))
+//                .build();
+//    }
+//
+//
+//    @PatchMapping("{id}")
+//    ApiResponse<AddressAdminResponse> update(@PathVariable String id, @RequestBody AddressAdminRequest request) {
+//        return ApiResponse.<AddressAdminResponse>builder()
+//                .result(addressService.update(id, request))
+//                .build();
+//    }
+//
+//    @DeleteMapping("{id}")
+//    void delete(@PathVariable String id) {
+//        addressService.delete(id);
+//    }
 
 }

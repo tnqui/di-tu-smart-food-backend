@@ -1,13 +1,10 @@
-package com.tranngocqui.ditusmartfoodbackend.dto.admin.item;
-
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.category.CategoryResponse;
+package com.tranngocqui.ditusmartfoodbackend.dto.admin.product;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
 
-public record ItemAdminResponse(
-        String id,
+public record ProductAdminRequest(
         String name,
         String description,
         BigDecimal price,
@@ -18,6 +15,9 @@ public record ItemAdminResponse(
         Boolean enabled,
         Instant createdAt,
         Instant updatedAt,
-        Set<CategoryResponse> categories
+        Set<String> categories
+
+
 ) {
+
 }

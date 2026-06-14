@@ -6,9 +6,10 @@ import com.tranngocqui.ditusmartfoodbackend.dto.client.response.AuthClientRespon
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import com.tranngocqui.ditusmartfoodbackend.mapper.ClientMapper;
-import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtServiceImpl;
 import com.tranngocqui.ditusmartfoodbackend.service.application.clientservice.AuthClientService;
+import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,7 @@ public class AuthClientController {
     private final ClientMapper clientMapper;
 
     @PostMapping("/login")
-    public ApiResponse<AuthClientResponse> login(@RequestBody AuthClientRequest authClientRequest) {
+    public ResponseEntity<ApiResponse<AuthClientResponse>> login(@RequestBody AuthClientRequest authClientRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authClientRequest.getIdentifier(), authClientRequest.getPassword())
@@ -43,7 +44,7 @@ public class AuthClientController {
         response.setAccessToken(accessToken);
         response.setRefreshToken(refreshToken);
 
-        return ApiResponse.<AuthClientResponse>builder().result(response).build();
+        return ResponseEntity.ok(ApiResponse.success(response));
 
     }
 

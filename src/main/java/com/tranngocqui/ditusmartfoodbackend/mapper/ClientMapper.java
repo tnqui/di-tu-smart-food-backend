@@ -9,7 +9,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ClientMapper {
 
-    @Mapping(source = "addresses", target = "addresses")
     @Mapping(source = "id", target = "userId")
     AuthClientResponse toAuthClientResponse(User user);
 

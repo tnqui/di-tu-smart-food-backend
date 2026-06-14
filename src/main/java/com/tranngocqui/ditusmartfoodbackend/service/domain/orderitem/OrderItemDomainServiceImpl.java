@@ -1,30 +1,24 @@
 package com.tranngocqui.ditusmartfoodbackend.service.domain.orderitem;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.orderitem.OrderItemCheckAvailableRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.orderitem.OrderItemCheckAvailableResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.OrderItem;
-import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.repository.OrderItemRepository;
 import com.tranngocqui.ditusmartfoodbackend.service.BaseService;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.tranngocqui.ditusmartfoodbackend.service.BaseServiceFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class OrderItemDomainServiceImpl extends BaseService<OrderItem, UUID> implements OrderItemDomainService {
-    public OrderItemDomainServiceImpl(JpaRepository<OrderItem, UUID> repository) {
-        super(repository);
-    }
+public class OrderItemDomainServiceImpl implements OrderItemDomainService {
+    private final BaseService<OrderItem, UUID> baseService;
 
-    @Override
-    protected ErrorCode getNotFoundErrorCode() {
-        return ErrorCode.ORDER_ITEM_NOT_FOUND;
+    public OrderItemDomainServiceImpl(BaseServiceFactory baseServiceFactory, OrderItemRepository orderItemRepository) {
+        this.baseService = baseServiceFactory.create(orderItemRepository);
     }
-
 
     @Override
     public List<OrderItem> listItemAvailable(List<OrderItem> request) {
-        return request.stream().map(item -> findOptionalById(item.getId()).orElse(null)).toList();
+        return request.stream().map(item -> baseService.findOptionalById(item.getId()).orElse(null)).toList();
     }
 }

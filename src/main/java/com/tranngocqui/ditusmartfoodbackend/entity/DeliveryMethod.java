@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted = false")
 public class DeliveryMethod extends BaseEntity {
     @Enumerated(EnumType.STRING)
-    private DeliveryMethodProvider shortName;
+    private DeliveryMethodProvider code;
     private String fullName;
     private BigDecimal pricePerKm;
 }

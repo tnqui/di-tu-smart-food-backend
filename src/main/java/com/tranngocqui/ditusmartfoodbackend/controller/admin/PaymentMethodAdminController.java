@@ -8,6 +8,7 @@ import com.tranngocqui.ditusmartfoodbackend.service.application.paymentMethod.Pa
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,39 +18,29 @@ public class PaymentMethodAdminController {
     private final PaymentMethodService paymentMethodService;
 
     @GetMapping()
-    ApiResponse<Page<PaymentMethodAdminResponse>> getAll(Pageable pageable) {
-        return ApiResponse.<Page<PaymentMethodAdminResponse>>builder()
-                .result(paymentMethodService.getAll(pageable))
-                .build();
+    public ResponseEntity<ApiResponse<Page<PaymentMethodAdminResponse>>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(paymentMethodService.getAll(pageable)));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<PaymentMethodAdminResponse> getById(@PathVariable String id) {
-        return ApiResponse.<PaymentMethodAdminResponse>builder()
-                .result(paymentMethodService.getById(id))
-                .build();
+    public ResponseEntity<ApiResponse<PaymentMethodAdminResponse>> getById(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success(paymentMethodService.getById(id)));
     }
 
     @PostMapping
-    ApiResponse<PaymentMethodAdminResponse> create(@RequestBody PaymentMethodAdminCreateRequest request) {
-        return ApiResponse.<PaymentMethodAdminResponse>builder()
-                .result(paymentMethodService.create(request))
-                .build();
+    public ResponseEntity<ApiResponse<PaymentMethodAdminResponse>> create(@RequestBody PaymentMethodAdminCreateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(paymentMethodService.create(request)));
     }
 
     @PatchMapping("/{id}")
-    ApiResponse<PaymentMethodAdminResponse> update(@PathVariable String id, @RequestBody PaymentMethodAdminUpdateRequest request) {
-        return ApiResponse.<PaymentMethodAdminResponse>builder()
-                .result(paymentMethodService.update(id, request))
-                .build();
+    public ResponseEntity<ApiResponse<PaymentMethodAdminResponse>> update(@PathVariable String id, @RequestBody PaymentMethodAdminUpdateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(paymentMethodService.update(id, request)));
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<Void> delete(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         paymentMethodService.deleteById(id);
-        return ApiResponse.<Void>builder()
-                .message("Successfully deleted payment method")
-                .build();
+        return ResponseEntity.ok(ApiResponse.success("Successfully deleted payment method"));
     }
 
 

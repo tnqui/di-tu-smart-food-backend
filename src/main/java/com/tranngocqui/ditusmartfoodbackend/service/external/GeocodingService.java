@@ -1,22 +1,25 @@
-package com.tranngocqui.ditusmartfoodbackend.service;
+package com.tranngocqui.ditusmartfoodbackend.service.external;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tranngocqui.ditusmartfoodbackend.dto.external.GeocodeResponse;
+import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@Slf4j
 public class GeocodingService {
 
     @Value("${mapbox.token}")
     private String mapboxToken;
 
-
     public GeocodeResponse geocode(String fullAddress) {
         try {
             if (fullAddress == null || fullAddress.length() < 10 || !fullAddress.contains(",")) {
-                throw new IllegalArgumentException("Địa chỉ không hợp lệ.");
+                throw new AppException(ErrorCode.ADDRESS_INVALID);
             }
 
             WebClient client = WebClient.builder()
@@ -34,7 +37,10 @@ public class GeocodingService {
                     .bodyToMono(JsonNode.class)
                     .block();
 
-            assert json != null;
+            if (json == null) {
+                throw new AppException(ErrorCode.GEOCODING_SERVICE_ERROR);
+            }
+
             JsonNode features = json.get("features");
 
             if (features == null || !features.isArray() || features.isEmpty()) {
@@ -55,7 +61,8 @@ public class GeocodingService {
             return new GeocodeResponse(lat, lon, matchedAddress);
 
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi xử lý geocoding: " + e.getMessage());
+            log.error(e.getMessage(), e);
+            throw new AppException(ErrorCode.GEOCODING_SERVICE_ERROR);
         }
     }
 

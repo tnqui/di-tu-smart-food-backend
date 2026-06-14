@@ -6,7 +6,6 @@ import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import com.tranngocqui.ditusmartfoodbackend.exception.AppException;
 import com.tranngocqui.ditusmartfoodbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.getDeleted()) {
             throw new AppException(ErrorCode.USER_HAS_BEEN_DELETED);
         }
+        
         return new CustomUserDetails(user);
     }
 

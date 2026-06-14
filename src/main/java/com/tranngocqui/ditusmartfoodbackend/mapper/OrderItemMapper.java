@@ -8,7 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrderItemMapper {
-    @Mapping(target = "itemName", source = "item.name")
+    @Mapping(target = "itemName", source = "product.name")
     OrderItemAdminCreateResponse toOrderItemAdminCreateResponse(OrderItem orderItem);
 
 }

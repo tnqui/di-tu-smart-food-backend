@@ -1,15 +1,9 @@
-package com.tranngocqui.ditusmartfoodbackend.dto.admin.item;
-
-import com.tranngocqui.ditusmartfoodbackend.entity.Category;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+package com.tranngocqui.ditusmartfoodbackend.dto.admin.product;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
-public record ItemAdminUpdateRequest(
+public record ProductAdminUpdateRequest(
         String name,
         String description,
         BigDecimal price,

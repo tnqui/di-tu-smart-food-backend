@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.service.application.category;
+package com.tranngocqui.ditusmartfoodbackend.service.category;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.category.CategoryAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.category.CategoryAdminResponse;
@@ -19,4 +19,8 @@ public interface CategoryService {
 
     void delete(String id);
 //    List<CategoryAdminResponse> findAll();
+
+    List<CategoryClientResponse> getAll();
+
+
 }

@@ -7,6 +7,7 @@ import com.tranngocqui.ditusmartfoodbackend.service.application.deliverymethod.D
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,38 +17,28 @@ public class DeliveryMethodAdminController {
     private final DeliveryMethodService deliveryMethodService;
 
     @PostMapping
-    ApiResponse<DeliveryMethodAdminResponse> create(@RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
-        return ApiResponse.<DeliveryMethodAdminResponse>builder()
-                .result(deliveryMethodService.create(deliveryMethodAdminRequest))
-                .build();
+    public ResponseEntity<ApiResponse<DeliveryMethodAdminResponse>> create(@RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
+        return ResponseEntity.ok(ApiResponse.success(deliveryMethodService.create(deliveryMethodAdminRequest)));
     }
 
     @PatchMapping("/{id}")
-    ApiResponse<DeliveryMethodAdminResponse> update(@PathVariable String id, @RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
-        return ApiResponse.<DeliveryMethodAdminResponse>builder()
-                .result(deliveryMethodService.update(id, deliveryMethodAdminRequest))
-                .build();
+    public ResponseEntity<ApiResponse<DeliveryMethodAdminResponse>> update(@PathVariable String id, @RequestBody DeliveryMethodAdminRequest deliveryMethodAdminRequest) {
+        return ResponseEntity.ok(ApiResponse.success(deliveryMethodService.update(id, deliveryMethodAdminRequest)));
     }
 
     @GetMapping()
-    ApiResponse<Page<DeliveryMethodAdminResponse>> getPagination(Pageable pageable) {
-        return ApiResponse.<Page<DeliveryMethodAdminResponse>>builder()
-                .result(deliveryMethodService.getPagination(pageable))
-                .build();
+    public ResponseEntity<ApiResponse<Page<DeliveryMethodAdminResponse>>> getPagination(Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(deliveryMethodService.getPagination(pageable)));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<DeliveryMethodAdminResponse> get(@PathVariable String id) {
-        return ApiResponse.<DeliveryMethodAdminResponse>builder()
-                .result(deliveryMethodService.get(id))
-                .build();
+    public ResponseEntity<ApiResponse<DeliveryMethodAdminResponse>> get(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success(deliveryMethodService.get(id)));
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<Void> deleteById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteById(@PathVariable String id) {
         deliveryMethodService.delete(id);
-        return ApiResponse.<Void>builder()
-                .message("Successfully deleted the delivery method")
-                .build();
+        return ResponseEntity.ok(ApiResponse.success("Successfully deleted the delivery method"));
     }
 }

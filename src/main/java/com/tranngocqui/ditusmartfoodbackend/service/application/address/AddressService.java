@@ -5,6 +5,8 @@ import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminRespon
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface AddressService {
     AddressAdminResponse create(AddressAdminRequest request);
 
@@ -15,4 +17,6 @@ public interface AddressService {
     AddressAdminResponse get(String id);
 
     Page<AddressAdminResponse> getPagination(Pageable pageable);
+
+    List<AddressAdminResponse> getByUserId(String userId);
 }
