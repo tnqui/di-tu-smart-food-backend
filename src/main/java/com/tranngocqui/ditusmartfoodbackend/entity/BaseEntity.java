@@ -24,21 +24,21 @@ import java.util.UUID;
 public abstract class BaseEntity {
 
     @Id
-    private UUID id;
+    protected UUID id;
 
     @Column(nullable = false)
     @ColumnDefault("false")
     @Builder.Default
-    private Boolean deleted = false;
+    protected Boolean deleted = false;
 
-    private Instant deletedAt;
+    protected Instant deletedAt;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    protected Instant createdAt;
 
     @LastModifiedDate
-    private Instant updatedAt;
+    protected Instant updatedAt;
 
     @PrePersist
     public void prePersist() {

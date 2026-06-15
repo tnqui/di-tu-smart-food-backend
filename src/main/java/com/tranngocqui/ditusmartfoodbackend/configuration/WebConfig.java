@@ -1,39 +1,71 @@
 package com.tranngocqui.ditusmartfoodbackend.configuration;
 
+import com.tranngocqui.ditusmartfoodbackend.constant.PublicUrl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.util.Arrays;
+import java.util.List;
 
 @EnableWebMvc
 @Configuration
+@RequiredArgsConstructor
+
 public class WebConfig {
+    private final JwtDecoder jwtDecoder;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(PublicUrl.PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
+                        .decoder(jwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter)
+                ));
+        return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:3000"
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000"  // Next.js dev
         ));
-        corsConfiguration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
-        corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setMaxAge(3600L);
+
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", corsConfiguration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

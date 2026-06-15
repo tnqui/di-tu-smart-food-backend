@@ -1,0 +1,56 @@
+package com.tranngocqui.ditusmartfoodbackend.configuration;
+
+import com.tranngocqui.ditusmartfoodbackend.entity.TwoFactorAuthenticationToken;
+import com.tranngocqui.ditusmartfoodbackend.service.user.UserService;
+import com.tranngocqui.ditusmartfoodbackend.tempservice.application.auth.GoogleAuthenticatorService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class TwoFactorAuthenticationProvider implements AuthenticationProvider {
+
+    private final UserService userService;
+    private final GoogleAuthenticatorService googleAuthService;
+    private final PasswordEncoder passwordEncoder;
+
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+//        String username = authentication.getName();
+//        String password = authentication.getCredentials().toString();
+//
+//        User user = userService.getByEmail(username).orElseThrow(() -> new BadCredentialsException("Username not found"));
+//
+//        if (user == null) {
+//            throw new BadCredentialsException("User không tồn tại");
+//        }
+//
+//        if (!passwordEncoder.matches(password, user.getPassword())) {
+//            throw new BadCredentialsException("Mật khẩu không đúng");
+//        }
+//
+//        if (authentication instanceof TwoFactorAuthenticationToken twoFactorToken) {
+//            int code = twoFactorToken.getCode();
+//
+//            if (googleAuthService.verifyCode(user.getTwoFactorSecret(), code)) {
+//                return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
+//            } else {
+//                throw new AppException(ErrorCode.TWO_FACTOR_MISMATCH);
+//            }
+//        }
+//
+//        throw new AppException(ErrorCode.TWO_FACTOR_REQUIRED);
+        return null;
+
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(TwoFactorAuthenticationToken.class);
+    }
+}

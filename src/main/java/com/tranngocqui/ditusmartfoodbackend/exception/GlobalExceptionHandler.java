@@ -2,13 +2,18 @@ package com.tranngocqui.ditusmartfoodbackend.exception;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import software.amazon.awssdk.services.ses.model.MessageRejectedException;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
@@ -33,7 +38,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        log.error(e.getMessage(), e);
         return ResponseEntity.internalServerError().body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Server Error"));
+    }
+
+    @ExceptionHandler(MessageRejectedException.class)
+    public ResponseEntity<ApiResponse<?>> handleMessageRejectedException(MessageRejectedException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Invalid Email Address"));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase()));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Invalid Content-Type"));
     }
 
 }

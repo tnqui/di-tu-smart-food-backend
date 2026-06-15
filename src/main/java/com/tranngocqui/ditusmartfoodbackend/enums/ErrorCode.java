@@ -41,7 +41,8 @@ public enum ErrorCode {
     TWO_FACTOR_NOT_ENABLED(1114, "Two-factor authentication is not enabled", HttpStatus.BAD_REQUEST),
     INVALID_TWO_FACTOR_CODE(1115, "Invalid two-factor code", HttpStatus.UNAUTHORIZED),
     USER_HAS_BEEN_DELETED(1116, "User has been deleted", HttpStatus.GONE),
-
+    WRONG_LOGIN_INFORMATION(1127, "Wrong login information", HttpStatus.UNAUTHORIZED),
+    SESSION_EXPIRED(1128, "Session has expired", HttpStatus.UNAUTHORIZED),
     // ========== AUTHORIZATION ERRORS (1200-1299) ==========
     FORBIDDEN(1200, "Access forbidden", HttpStatus.FORBIDDEN),
     UNAUTHORIZED(1201, "Unauthorized access", HttpStatus.FORBIDDEN),
@@ -230,6 +231,7 @@ public enum ErrorCode {
     EXPORT_FAILED(3003, "Data export failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // ========== THIRD-PARTY INTEGRATION ERRORS (3100-3199) ==========
+    EMAIL_SERVICE_DISABLED(3004, "Email service disabled", HttpStatus.BAD_REQUEST),
     EXTERNAL_SERVICE_ERROR(3100, "External service error", HttpStatus.BAD_GATEWAY),
     API_RATE_LIMIT_EXCEEDED(3101, "API rate limit exceeded", HttpStatus.TOO_MANY_REQUESTS),
     EXTERNAL_API_TIMEOUT(3102, "External API timeout", HttpStatus.GATEWAY_TIMEOUT),

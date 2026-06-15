@@ -1,31 +1,25 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.admin;
 
-import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss.AddressAdminResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.application.address.AddressService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/addresses")
 @RequiredArgsConstructor
 public class AddressAdminController {
-    private final AddressService addressService;
-
-    @GetMapping("{userId}")
-    public ResponseEntity<ApiResponse<List<AddressAdminResponse>>> getAddressByUserId(@PathVariable String userId) {
-        return ResponseEntity.ok(ApiResponse.success(addressService.getByUserId(userId)));
-    }
-
-
-    @PostMapping
-    ResponseEntity<ApiResponse<AddressAdminResponse>> create(@RequestBody AddressAdminRequest addressAdminRequest) {
-        return ResponseEntity.ok(ApiResponse.success(addressService.create(addressAdminRequest)));
-    }
+//    private final AddressService addressService;
+//
+//    @GetMapping("{userId}")
+//    public ResponseEntity<ApiResponse<List<AddressAdminResponse>>> getAddressByUserId(@PathVariable String userId) {
+//        return ResponseEntity.ok(ApiResponse.success(addressService.getByUserId(userId)));
+//    }
+//
+//
+//    @PostMapping
+//    ResponseEntity<ApiResponse<AddressAdminResponse>> create(@RequestBody AddressAdminRequest addressAdminRequest) {
+//        return ResponseEntity.ok(ApiResponse.success(addressService.create(addressAdminRequest)));
+//    }
 
 
 //

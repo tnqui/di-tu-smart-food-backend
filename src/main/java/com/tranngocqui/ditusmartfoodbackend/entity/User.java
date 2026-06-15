@@ -1,25 +1,26 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PRIVATE)
 @Entity
-@SuperBuilder(toBuilder = true)
+@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Where(clause = "deleted = false")
 @Table(name = "users")
-public class User extends BaseEntity {
-    private String fullName;
+public class User extends BaseEntity implements UserDetails {
 
     @Column(unique = true)
     private String email;
@@ -28,14 +29,18 @@ public class User extends BaseEntity {
     private String phone;
 
     private String password;
-    @Builder.Default
-    private Boolean isEmailVerified = false;
-    @Builder.Default
-    private Boolean isPhoneVerified = false;
-    @Builder.Default
-    private boolean enabled = true;
-    @Builder.Default
-    private Integer loginAttempts = 0;
+
+    private String firstName;
+
+    private String lastName;
+
+    private boolean emailVerified;
+
+    private boolean isPhoneVerified;
+
+    private boolean enabled;
+
+    private int loginAttempts;
 
     private Instant lastLoginAt;
 
@@ -49,24 +54,58 @@ public class User extends BaseEntity {
 
     private String twoFactorSecret;
 
-    @Builder.Default
-    private Boolean twoFactorEnabled = false;
+    private boolean twoFactorEnabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Address> addresses = new ArrayList<>();
+    private List<Address> addresses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Jwt> jwts = new ArrayList<>();
+    private List<Jwt> jwts;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    @Enumerated(EnumType.STRING)
+    private Set<UserRole> roles;
 
-    private Set<Role> roles;
+    @OneToMany
+    private Set<Permission> permissions;
 
+    public static User clientRegister(String email, String phone, String password, String firstName, String lastName) {
+        return User.builder()
+                .email(email)
+                .phone(phone)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailVerified(false)
+                .enabled(false)
+                .loginAttempts(0)
+                .lastLoginAt(Instant.now())
+                .lastLoginIp("")
+                .avatarUrl("")
+                .language("")
+                .timezone("")
+                .twoFactorSecret("")
+                .twoFactorEnabled(false)
+                .roles(Set.of(UserRole.CUSTOMER))
+                .build();
+    }
+
+    public void verifyEmail() {
+        emailVerified = true;
+        enabled=true;
+    }
+
+    public boolean canLogin() {
+        return emailVerified && enabled && !deleted;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
+    }
 }

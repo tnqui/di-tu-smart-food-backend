@@ -1,14 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.external;
 
 
-import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentTransactionResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.payment.PaymentWebhookResponse;
-import com.tranngocqui.ditusmartfoodbackend.service.application.paymenttransaction.PaymentTransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/payment/momo")
 @RequiredArgsConstructor
 public class MoMoController {
-    private final PaymentTransactionService paymentTransactionService;
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<PaymentTransactionResponse>> callbackWebhook(@RequestBody PaymentWebhookResponse response) {
-        return ResponseEntity.ok(ApiResponse.success(paymentTransactionService.updateFromCallbackData(response)));
-    }
+//    private final PaymentTransactionService paymentTransactionService;
+//
+//    @PostMapping
+//    public ResponseEntity<ApiResponse<PaymentTransactionResponse>> callbackWebhook(@RequestBody PaymentWebhookResponse response) {
+//        return ResponseEntity.ok(ApiResponse.success(paymentTransactionService.updateFromCallbackData(response)));
+//    }
 
 }

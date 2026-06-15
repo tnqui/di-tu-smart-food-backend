@@ -1,66 +1,61 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.client;
 
+import com.tranngocqui.ditusmartfoodbackend.configuration.jwt.JwtProperties;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
-import com.tranngocqui.ditusmartfoodbackend.dto.client.request.AuthClientRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginByEmailAndPasswordRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientRegisterRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.response.AuthClientResponse;
-import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
-import com.tranngocqui.ditusmartfoodbackend.entity.User;
-import com.tranngocqui.ditusmartfoodbackend.mapper.ClientMapper;
-import com.tranngocqui.ditusmartfoodbackend.service.application.clientservice.AuthClientService;
-import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtServiceImpl;
+import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@RequestMapping("/api/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthClientController {
 
-    private final AuthClientService authClientService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtServiceImpl jwtService;
-    private final ClientMapper clientMapper;
+    private final AuthService authService;
+    private final JwtProperties jwtProperties;
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthClientResponse>> login(@RequestBody AuthClientRequest authClientRequest) {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authClientRequest.getIdentifier(), authClientRequest.getPassword())
-        );
-
-        User user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
-
-        String accessToken = jwtService.generateToken(user);
-
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        AuthClientResponse response = clientMapper.toAuthClientResponse(user);
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken);
-
-        return ResponseEntity.ok(ApiResponse.success(response));
-
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthClientResponse>> login(@RequestBody AuthClientRegisterRequest request) {
+        authService.clientRegister(request);
+        return ResponseEntity.ok(ApiResponse.success("Verification link has been sent to your email!"));
     }
 
-//    @PostMapping("/login")
-//    ApiResponse<AuthClientResponse> login(@RequestBody AuthClientRequest authClientRequest) {
-//        return ApiResponse.<AuthClientResponse>builder()
-//                .result(authClientService.login(authClientRequest))
-//                .build();
-//    };
-//
-//    @PostMapping("/refresh")
-//    ApiResponse<AuthClientResponse> refreshToken(@RequestBody AuthClientRequest authClientRequest) {
-//        return ApiResponse.<AuthClientResponse>builder()
-//                .result(authClientService.login(authClientRequest))
-//                .build();
-//    };
+    @GetMapping("/register/verify")
+    public ResponseEntity<ApiResponse<AuthClientResponse>> verifyEmail(@RequestParam("token") String token) {
+        authService.verifyEmailVerificationLink(token);
+        return ResponseEntity.ok(ApiResponse.success("Successfully verified your email!"));
+    }
 
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthClientLoginResponse>> login(@RequestBody AuthClientLoginByEmailAndPasswordRequest request, HttpServletResponse response) {
+        var token = authService.clientLoginByEmailAndPassword(request);
+
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", token.refreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtProperties.refreshTokenExpiration())
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(ApiResponse.success(AuthClientLoginResponse.builder()
+                .accessToken(token.accessToken())
+                .build()));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<?>> refresh(@CookieValue("refresh_token") String token) {
+        return ResponseEntity.ok(ApiResponse.success(authService.refresh(token)));
+    }
 
 }
