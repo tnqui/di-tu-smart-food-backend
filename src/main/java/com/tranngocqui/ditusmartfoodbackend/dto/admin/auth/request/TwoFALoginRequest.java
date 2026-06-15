@@ -1,9 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request;
 
-import lombok.Data;
+public record TwoFALoginRequest(
+        String code,
+        String tempToken
+) {
 
-@Data
-public class TwoFALoginRequest {
-    private String code;
-    private String tempToken;
 }

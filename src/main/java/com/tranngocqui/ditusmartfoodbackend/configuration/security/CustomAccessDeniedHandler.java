@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

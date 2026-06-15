@@ -1,26 +1,19 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Builder
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class MenuItemClientResponse {
-    private String id;
-    private String name;
-    private BigDecimal price;
-    private BigDecimal oldPrice;
-    private Integer orderCount;
-    private String imageUrl;
-    private Double rating;
-    private String tag;
-    private String description;
-
-//    private Set<CategoryClientResponse> categories;
+public record MenuItemClientResponse(
+        String id,
+        String name,
+        BigDecimal price,
+        BigDecimal oldPrice,
+        Integer orderCount,
+        String imageUrl,
+        Double rating,
+        String tag,
+        String description
+) {
 }

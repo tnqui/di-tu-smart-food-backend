@@ -1,16 +1,15 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.payment;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentStatus;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
-@Data
-public class PaymentQueryResponse {
-    private PaymentStatus status;
-    private String transactionId;
-    private BigDecimal amount;
-    private String errorMessage;
-    private Instant paidAt;
+public record PaymentQueryResponse(
+        PaymentStatus status,
+        String transactionId,
+        BigDecimal amount,
+        String errorMessage,
+        Instant paidAt
+) {
 }

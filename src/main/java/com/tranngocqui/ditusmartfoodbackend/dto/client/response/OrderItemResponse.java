@@ -1,13 +1,11 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.response;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 
-@Data
-public class OrderItemResponse {
-    private String id;
-    private Integer quantity;
-    private BigDecimal priceAtOrderedTime;
-    private String menuItemName;
+public record OrderItemResponse(
+        String id,
+        Integer quantity,
+        BigDecimal priceAtOrderedTime,
+        String menuItemName
+) {
 }

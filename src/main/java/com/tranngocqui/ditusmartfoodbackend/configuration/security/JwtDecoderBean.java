@@ -1,10 +1,9 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;

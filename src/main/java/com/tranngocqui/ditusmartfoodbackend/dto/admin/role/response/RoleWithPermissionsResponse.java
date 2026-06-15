@@ -1,19 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.role.response;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.permission.response.PermissionAdminResponse;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class RoleWithPermissionsResponse {
-    private String name;
-    private String description;
-    private Set<PermissionAdminResponse> permissions;
+public record RoleWithPermissionsResponse(
+        String name,
+        String description,
+        Set<PermissionAdminResponse> permissions
+) {
 }

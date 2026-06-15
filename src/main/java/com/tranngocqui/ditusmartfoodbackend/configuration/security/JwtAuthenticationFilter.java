@@ -1,8 +1,7 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.tranngocqui.ditusmartfoodbackend.configuration.SecurityConfig;
 import com.tranngocqui.ditusmartfoodbackend.entity.CustomUserDetails;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
 import com.tranngocqui.ditusmartfoodbackend.service.application.jwt.JwtService;

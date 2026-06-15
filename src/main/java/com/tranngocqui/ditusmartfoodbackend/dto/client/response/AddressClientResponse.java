@@ -1,15 +1,14 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.response;
 
-import lombok.Data;
+import lombok.Builder;
 
-import java.util.UUID;
-
-@Data
-public class AddressClientResponse {
-    private String id;
-    private String label;
-    private String fullAddress;
-    private Double latitude;
-    private Double longitude;
-    private boolean defaultAddress;
+@Builder
+public record AddressClientResponse(
+        String id,
+        String label,
+        String fullAddress,
+        Double latitude,
+        Double longitude,
+        boolean defaultAddress
+) {
 }

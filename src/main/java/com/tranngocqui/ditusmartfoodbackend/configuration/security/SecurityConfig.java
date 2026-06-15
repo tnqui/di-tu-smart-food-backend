@@ -1,9 +1,5 @@
-package com.tranngocqui.ditusmartfoodbackend.configuration;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
-import com.tranngocqui.ditusmartfoodbackend.security.CustomAccessDeniedHandler;
-import com.tranngocqui.ditusmartfoodbackend.security.CustomAuthenticationEntryPoint;
-import com.tranngocqui.ditusmartfoodbackend.security.JwtAuthenticationFilter;
-import com.tranngocqui.ditusmartfoodbackend.security.TwoFactorAuthenticationProvider;
 import com.tranngocqui.ditusmartfoodbackend.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

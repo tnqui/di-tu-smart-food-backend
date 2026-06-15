@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
 import com.tranngocqui.ditusmartfoodbackend.entity.TwoFactorAuthenticationToken;
 import com.tranngocqui.ditusmartfoodbackend.entity.User;

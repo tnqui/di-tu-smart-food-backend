@@ -1,18 +1,12 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request;
 
-import lombok.*;
+import lombok.Builder;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class TokenRequest {
-
-    private String email;
-
-    private String phone;
-
-    private Integer code;
-
-    private String password;
+public record TokenRequest(
+        String email,
+        String phone,
+        Integer code,
+        String password
+) {
 }

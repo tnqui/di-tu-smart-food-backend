@@ -1,12 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request;
 
-import lombok.*;
+import lombok.Builder;
 
-//Verify token
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class IntrospectRequest {
-    private String token;
+public record IntrospectRequest(
+        String token
+) {
 }

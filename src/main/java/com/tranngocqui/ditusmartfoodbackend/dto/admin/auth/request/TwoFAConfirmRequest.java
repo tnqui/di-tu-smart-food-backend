@@ -1,9 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request;
 
-import lombok.Data;
+public record TwoFAConfirmRequest(
+        String email,
+        String code
+) {
 
-@Data
-public class TwoFAConfirmRequest {
-    private String email;
-    private String code;
 }

@@ -1,9 +1,8 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.request;
 
-import lombok.Data;
+public record TwoFASetupRequest(
+        String setUpToken,
+        String otp
+) {
 
-@Data
-public class TwoFASetupRequest {
-    private String setUpToken;
-    private String otp;
 }

@@ -1,15 +1,16 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+import lombok.Builder;
 
-@Data
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthResponse {
-    private String accessToken;
-    private String refreshToken;
-    private String tempToken;
-    private boolean requires2FA;
-    private String redirectUrl;
-    private String message;
+public record AuthResponse(
+        String accessToken,
+        String refreshToken,
+        String tempToken,
+        boolean requires2FA,
+        String redirectUrl,
+        String message
+) {
 }

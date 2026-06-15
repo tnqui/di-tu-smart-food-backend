@@ -1,28 +1,20 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.response;
 
-import lombok.Data;
-
-import java.util.UUID;
+import lombok.Builder;
 
 import java.util.List;
+import java.util.UUID;
 
-@Data
-public class AuthClientResponse {
-    private UUID userId;
-    private String email;
-    private String fullName;
-    private String phone;
-    private String avatarUrl;
-    private List<AddressClientResponse> addresses;
-
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType = "Bearer";
-//
-//    private int loyaltyPoints;
-//    private String preferredPaymentMethod; // ví dụ: "CASH", "CARD"
-
-    // ==== Notification settings (optional) ====
-//    private boolean notificationEnabled;
-
+@Builder
+public record AuthClientResponse(
+        UUID userId,
+        String email,
+        String fullName,
+        String phone,
+        String avatarUrl,
+        List<AddressClientResponse> addresses,
+        String accessToken,
+        String refreshToken,
+        String tokenType
+) {
 }

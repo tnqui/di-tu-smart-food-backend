@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.security;
+package com.tranngocqui.ditusmartfoodbackend.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

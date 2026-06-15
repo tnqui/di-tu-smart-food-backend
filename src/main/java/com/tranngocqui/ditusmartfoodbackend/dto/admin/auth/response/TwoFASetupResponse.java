@@ -1,15 +1,10 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.auth.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class TwoFASetupResponse {
-    private String qrAuthenticationSetup;
-    private String message;
+public record TwoFASetupResponse(
+        String qrAuthenticationSetup,
+        String message
+) {
 }

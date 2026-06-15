@@ -1,23 +1,15 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.response;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class OrderItemDTO {
-
-    private Long menuItemId;
-
-    private String menuItemName;
-
-    private String name;
-
-    private int quantity;
-
-    private BigDecimal priceAtOrderTime;
-
+public record OrderItemDTO(
+        Long menuItemId,
+        String menuItemName,
+        String name,
+        int quantity,
+        BigDecimal priceAtOrderTime
+) {
 }
