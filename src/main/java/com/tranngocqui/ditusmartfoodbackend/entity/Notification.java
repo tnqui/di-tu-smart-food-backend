@@ -4,7 +4,7 @@ import com.tranngocqui.ditusmartfoodbackend.enums.NotificationStatus;
 import com.tranngocqui.ditusmartfoodbackend.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,14 +13,13 @@ import org.hibernate.annotations.Where;
 
 import java.time.Instant;
 
-@Getter
-@Setter
 @Entity
-@SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Where(clause = "deleted = false")
 @Table(name = "notifications")
+@Getter
+@Setter(AccessLevel.PRIVATE)
+@SuperBuilder(toBuilder = true)
+@Where(clause = "deleted = false")
+@NoArgsConstructor
 public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", columnDefinition = "UUID")

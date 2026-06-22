@@ -2,9 +2,14 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
@@ -15,11 +20,10 @@ import java.util.Set;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Builder(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @Where(clause = "deleted = false")
 @Table(name = "users")
+@NoArgsConstructor
 public class User extends BaseEntity implements UserDetails {
 
     @Column(unique = true)
@@ -59,14 +63,16 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Jwt> jwts;
-
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles;
 
     @OneToMany
     private Set<Permission> permissions;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).toList();
+    }
 
     public static User clientRegister(String email, String phone, String password, String firstName, String lastName) {
         return User.builder()
@@ -89,23 +95,39 @@ public class User extends BaseEntity implements UserDetails {
                 .build();
     }
 
+
     public void verifyEmail() {
         emailVerified = true;
-        enabled=true;
+        enabled = true;
     }
 
     public boolean canLogin() {
         return emailVerified && enabled && !deleted;
     }
 
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
     @Override
     public String getUsername() {
         return "";
+    }
+
+    public static User registerUserDemo(String email, String phone, String password, String firstName, String lastName, Set<UserRole> roles) {
+        return User.builder()
+                .email(email)
+                .phone(phone)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailVerified(true)
+                .enabled(true)
+                .loginAttempts(0)
+                .lastLoginAt(Instant.now())
+                .lastLoginIp("")
+                .avatarUrl("")
+                .language("")
+                .timezone("")
+                .twoFactorSecret("")
+                .twoFactorEnabled(false)
+                .roles(roles)
+                .build();
     }
 }

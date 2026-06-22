@@ -2,7 +2,10 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
@@ -10,14 +13,13 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
-@SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Where(clause = "deleted = false")
 @Table(name = "orders")
+@Getter
+@Setter(AccessLevel.PRIVATE)
+@SuperBuilder(toBuilder = true)
+@Where(clause = "deleted = false")
+@NoArgsConstructor
 public class Order extends BaseEntity {
 
     private String orderId;

@@ -8,13 +8,13 @@ import org.hibernate.annotations.Where;
 import java.math.BigDecimal;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity
+@Table(name = "products")
+@Getter
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted = false")
+@NoArgsConstructor
 public class Product extends BaseEntity {
     private String name;
     private String description;

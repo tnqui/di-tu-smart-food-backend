@@ -1,13 +1,13 @@
 package com.tranngocqui.ditusmartfoodbackend.controller.client;
 
-import com.tranngocqui.ditusmartfoodbackend.configuration.jwt.JwtProperties;
+import com.tranngocqui.ditusmartfoodbackend.configuration.properties.JwtProperties;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginByEmailAndPasswordRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientRegisterRequest;
-import com.tranngocqui.ditusmartfoodbackend.dto.client.response.AuthClientResponse;
 import com.tranngocqui.ditusmartfoodbackend.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -23,19 +23,19 @@ public class AuthClientController {
     private final JwtProperties jwtProperties;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthClientResponse>> login(@RequestBody AuthClientRegisterRequest request) {
+    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody AuthClientRegisterRequest request) {
         authService.clientRegister(request);
         return ResponseEntity.ok(ApiResponse.success("Verification link has been sent to your email!"));
     }
 
     @GetMapping("/register/verify")
-    public ResponseEntity<ApiResponse<AuthClientResponse>> verifyEmail(@RequestParam("token") String token) {
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
         authService.verifyEmailVerificationLink(token);
         return ResponseEntity.ok(ApiResponse.success("Successfully verified your email!"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthClientLoginResponse>> login(@RequestBody AuthClientLoginByEmailAndPasswordRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<AuthClientLoginResponse>> login(@Valid @RequestBody AuthClientLoginByEmailAndPasswordRequest request, HttpServletResponse response) {
         var token = authService.clientLoginByEmailAndPassword(request);
 
         ResponseCookie cookie = ResponseCookie.from("refresh_token", token.refreshToken())

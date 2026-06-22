@@ -1,8 +1,11 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethodProvider;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,13 +14,13 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
 @Entity
+@Table(name = "delivery_methods")
+@Getter
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted = false")
+@NoArgsConstructor
 public class DeliveryMethod extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private DeliveryMethodProvider code;

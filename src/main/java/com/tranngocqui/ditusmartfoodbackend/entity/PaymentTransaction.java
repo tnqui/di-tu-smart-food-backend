@@ -3,21 +3,23 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import com.tranngocqui.ditusmartfoodbackend.enums.TransactionStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@Entity
 @Table(name = "payment_transactions")
 @Getter
-@Setter
-@Entity
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted = false")
+@NoArgsConstructor
 public class PaymentTransaction extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)

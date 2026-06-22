@@ -1,6 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.service.auth;
 
-import com.tranngocqui.ditusmartfoodbackend.configuration.jwt.JwtProperties;
+import com.tranngocqui.ditusmartfoodbackend.configuration.properties.JwtProperties;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginByEmailAndPasswordRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientLoginResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.auth.client.AuthClientRegisterRequest;

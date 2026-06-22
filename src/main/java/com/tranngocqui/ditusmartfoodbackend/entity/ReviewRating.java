@@ -5,21 +5,20 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
-@Getter
-@Setter
 @Entity
-@SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Where(clause = "deleted = false")
 @Table(name = "review_ratings", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "item_id"}))
+@Getter
+@Setter(AccessLevel.PRIVATE)
+@SuperBuilder(toBuilder = true)
+@Where(clause = "deleted = false")
+@NoArgsConstructor
 public class ReviewRating extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

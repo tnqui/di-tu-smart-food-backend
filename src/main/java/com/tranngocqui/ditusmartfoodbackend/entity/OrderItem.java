@@ -1,7 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,13 +10,13 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
 @Entity
+@Table(name = "order_items")
+@Getter
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted = false")
+@NoArgsConstructor
 public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

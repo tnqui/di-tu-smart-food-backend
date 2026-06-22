@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import software.amazon.awssdk.services.ses.model.MessageRejectedException;
 
+import java.util.Objects;
+
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,8 +28,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        String messageCode = Objects.requireNonNull(e.getBindingResult()
+                        .getFieldError())
+                .getDefaultMessage();
+
+        ErrorCode errorCode = ErrorCode.parse(messageCode);
+
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), errorCode.getMessage()));
     }
 
     @ExceptionHandler(RedisConnectionFailureException.class)
@@ -44,16 +52,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MessageRejectedException.class)
     public ResponseEntity<ApiResponse<?>> handleMessageRejectedException(MessageRejectedException e) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Invalid Email Address"));
+        log.error(e.getMessage(), e);
+        return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Email is not verified!"));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        log.error(e.getMessage(), e);
         return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase()));
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        log.error(e.getMessage(), e);
         return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Invalid Content-Type"));
     }
 

@@ -2,7 +2,9 @@ package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
@@ -15,12 +17,10 @@ import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @SQLRestriction("deleted = false")
+@NoArgsConstructor
+@Getter
 public abstract class BaseEntity {
 
     @Id

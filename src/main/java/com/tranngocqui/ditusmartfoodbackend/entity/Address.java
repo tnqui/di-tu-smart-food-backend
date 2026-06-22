@@ -1,49 +1,51 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
-@Getter
-@Setter
+
 @Entity
+@Table(name = "addresses")
+@Getter
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
 @Where(clause = "deleted = false")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@AllArgsConstructor
 public class Address extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
-    String fullAddress;
+    private String fullAddress;
 
-    String houseNumber;
-
-    @Column(nullable = false, length = 255)
-    String street;
+    private String houseNumber;
 
     @Column(nullable = false, length = 255)
-    String ward;
+    private String street;
 
     @Column(nullable = false, length = 255)
-    String district;
+    private String ward;
 
     @Column(nullable = false, length = 255)
-    String city;
+    private String district;
 
     @Column(nullable = false, length = 255)
-    String country;
+    private String city;
 
-    Double latitude;
+    @Column(nullable = false, length = 255)
+    private String country;
 
-    Double longitude;
+    private Double latitude;
 
-    String geocodeMatchedAddress;
+    private Double longitude;
 
-    Boolean isDefault;
+    private String geocodeMatchedAddress;
+
+    private Boolean isDefault;
 }

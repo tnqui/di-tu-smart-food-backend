@@ -1,19 +1,24 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethodProvider;
-import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
-@Getter
-@Setter
 @Entity
+@Table(name = "payment_methods")
+@Getter
+@Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted = false")
+@NoArgsConstructor
 public class PaymentMethod extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
