@@ -41,7 +41,7 @@ public abstract class BaseEntity {
     protected Instant updatedAt;
 
     @PrePersist
-    public void prePersist() {
+    protected void prePersist() {
         if (id == null) {
             id = UUIDUtils.generateUUID();
         }
@@ -51,7 +51,7 @@ public abstract class BaseEntity {
     }
 
     @PreUpdate
-    public void preUpdate() {
+    protected void preUpdate() {
         updatedAt = Instant.now();
     }
 

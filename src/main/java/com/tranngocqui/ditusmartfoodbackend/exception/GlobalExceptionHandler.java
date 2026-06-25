@@ -1,11 +1,13 @@
 package com.tranngocqui.ditusmartfoodbackend.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.tranngocqui.ditusmartfoodbackend.dto.ApiResponse;
 import com.tranngocqui.ditusmartfoodbackend.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -67,5 +69,33 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
         return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Invalid Content-Type"));
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException e) {
+
+        Throwable cause = e.getCause();
+
+        if (cause instanceof InvalidFormatException ex) {
+
+            Class<?> targetType = ex.getTargetType();
+
+            if (targetType.isEnum()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error(
+                                400,
+                                "Invalid value '" + ex.getValue() +
+                                        "' for enum " + targetType.getSimpleName()
+                        ));
+            }
+        }
+
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(
+                        400,
+                        "Incorrect input data format"
+                ));
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.configuration;
+package com.tranngocqui.ditusmartfoodbackend.configuration.jwt;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.tranngocqui.ditusmartfoodbackend.configuration.properties.JwtProperties;

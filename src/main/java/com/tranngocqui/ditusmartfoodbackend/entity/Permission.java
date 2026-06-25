@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Table(name = "permission@")
+@Table(name = "permissions")
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @SuperBuilder(toBuilder = true)

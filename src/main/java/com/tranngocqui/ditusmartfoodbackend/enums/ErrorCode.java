@@ -69,6 +69,7 @@ public enum ErrorCode {
     INVALID_ENUM_VALUE(1310, "Invalid enum value", HttpStatus.BAD_REQUEST),
     WRONG_MESSAGE_CODE(1311, "Wrong message code", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PASSWORD_FORMAT(1312, "Invalid password format", HttpStatus.BAD_REQUEST),
+    QUANTITY_MUST_BE_POSITIVE(1313, "Quantity must be positive", HttpStatus.BAD_REQUEST),
     // ========== USER MANAGEMENT ERRORS (1400-1499) ==========
     USER_NOT_FOUND(1400, "User not found", HttpStatus.NOT_FOUND),
 
@@ -230,6 +231,10 @@ public enum ErrorCode {
     ORDER_ITEM_QUANTITY_INVALID(2213, "Invalid order item quantity", HttpStatus.BAD_REQUEST),
 
     ORDER_MINIMUM_AMOUNT_NOT_MET(2214, "Order does not meet minimum amount", HttpStatus.BAD_REQUEST),
+
+    ORDER_EMPTY_LIST(2215, "All the products in your order are currently out of stock. We apologize for the inconvenience.", HttpStatus.BAD_REQUEST),
+
+    NO_VALID_ORDER_ITEMS(2216, "No valid order items", HttpStatus.BAD_REQUEST),
 
     // ========== PAYMENT METHOD ERRORS (2300-2399) ==========
     PAYMENT_METHOD_NOT_FOUND(2300, "Payment method not found", HttpStatus.NOT_FOUND),

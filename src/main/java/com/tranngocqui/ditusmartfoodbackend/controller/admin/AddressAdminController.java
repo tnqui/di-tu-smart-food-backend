@@ -23,12 +23,10 @@ public class AddressAdminController {
         return ResponseEntity.ok(ApiResponse.success(addressService.getByUserId(userId)));
     }
 
-
     @PostMapping
     ResponseEntity<ApiResponse<AddressAdminResponse>> create(@RequestBody AddressAdminRequest addressAdminRequest) {
         return ResponseEntity.ok(ApiResponse.success(addressService.create(addressAdminRequest)));
     }
-
 
     @GetMapping("{id}")
     ResponseEntity<ApiResponse<AddressAdminResponse>> get(@PathVariable String id) {
@@ -48,7 +46,7 @@ public class AddressAdminController {
 
     @DeleteMapping("{id}")
     ResponseEntity<ApiResponse<Void>> deleteById(@PathVariable String id) {
-        addressService.delete(id);
+        addressService.deleteById(id);
         return ResponseEntity.ok(ApiResponse.success("Successfully deleted address"));
     }
 

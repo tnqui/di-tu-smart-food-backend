@@ -1,72 +1,81 @@
-//package com.tranngocqui.ditusmartfoodbackend.tempservice.domain.product;
-//
-//import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminRequest;
-//import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminResponse;
-//import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminUpdateRequest;
-//import com.tranngocqui.ditusmartfoodbackend.dto.client.response.ProductClientResponse;
-//import com.tranngocqui.ditusmartfoodbackend.entity.Product;
-//import com.tranngocqui.ditusmartfoodbackend.repository.ProductRepository;
-//import com.tranngocqui.ditusmartfoodbackend.tempservice.BaseService;
-//import com.tranngocqui.ditusmartfoodbackend.tempservice.BaseServiceFactory;
-//import com.tranngocqui.ditusmartfoodbackend.ultis.UUIDUtils;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.UUID;
-//
-//@Service
-//public class ProductServiceImpl implements ProductService {
-//    private final ProductMapper productMapper;
-//    private final BaseService<Product, UUID> productBaseService;
-//
-//    public ProductServiceImpl(ProductMapper productMapper, BaseServiceFactory factory, ProductRepository ProductRepository) {
-//        this.productMapper = productMapper;
-//        this.productBaseService = factory.create(ProductRepository);
-//    }
-//
-//    @Override
-//    public Page<ProductAdminResponse> getAll(Pageable pageable) {
-//        return productBaseService.findAll(pageable).map(productMapper::toProductAdminResponse);
-//    }
-//
-//    @Override
-//    public ProductAdminResponse getById(String id) {
-//        return productMapper.toProductAdminResponse(productBaseService.findByIdOrThrow(UUID.fromString(id)));
-//    }
-//
-//    @Override
-//    public ProductAdminResponse create(ProductAdminRequest request) {
-//        return productMapper.toProductAdminResponse(productBaseService.save(productMapper.toProduct(request)));
-//    }
-//
-//    @Override
-//    public ProductAdminResponse update(String id, ProductAdminUpdateRequest request) {
-//        Product Product = productBaseService.findByIdOrThrow(UUID.fromString(id));
-//
-//        productMapper.update(request, Product);
-//
-//        return productMapper.toProductAdminResponse(productBaseService.save(Product));
-//    }
-//
-//    @Override
-//    public void deleteById(String id) {
-//        productBaseService.deleteById(UUID.fromString(id));
-//    }
-//
-//    @Override
-//    public Page<ProductClientResponse> getByCategoryId(Pageable pageable, String categoryId) {
-//        return productBaseService.findAll(pageable).map(product -> productMapper.toProductClientResponse(productBaseService.findByIdOrThrow(UUID.fromString(categoryId))));
-//    }
-//
-//    @Override
-//    public Product getProductById(String id) {
-//        return productBaseService.findByIdOrThrow(UUIDUtils.parseUUUIDFromString(id));
-//    }
-//
-//    @Override
-//    public Page<ProductClientResponse> getPagination(Pageable pageable, String categoryId) {
-//        return null;
-//    }
-//
-//}
+package com.tranngocqui.ditusmartfoodbackend.tempservice.domain.product;
+
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminResponse;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.client.auth.response.ProductClientResponse;
+import com.tranngocqui.ditusmartfoodbackend.entity.Product;
+import com.tranngocqui.ditusmartfoodbackend.mapper.ProductMapper;
+import com.tranngocqui.ditusmartfoodbackend.repository.ProductRepository;
+import com.tranngocqui.ditusmartfoodbackend.service.product.ProductService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ProductServiceImpl implements ProductService {
+    private final ProductMapper productMapper;
+    private final ProductRepository productRepository;
+
+    public Page<ProductAdminResponse> getAll(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public List<Product> saveAll(List<Product> list) {
+        return productRepository.saveAll(list);
+    }
+
+    @Override
+    public ProductAdminResponse getById(String id) {
+        return null;
+    }
+
+    @Override
+    public ProductAdminResponse create(ProductAdminRequest request) {
+        return null;
+    }
+
+    @Override
+    public ProductAdminResponse update(String id, ProductAdminUpdateRequest request) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(String id) {
+    }
+
+    @Override
+    public Page<ProductClientResponse> getByCategoryId(Pageable pageable, String categoryId) {
+        return null;
+    }
+
+    @Override
+    public Product getProductById(String id) {
+        return null;
+    }
+
+    @Override
+    public Page<ProductClientResponse> getPagination(Pageable pageable, String categoryId) {
+        return null;
+    }
+
+    @Override
+    public List<Product> findByIds(List<UUID> ids) {
+        return productRepository.findByIds(ids);
+    }
+
+    @Override
+    @Transactional
+    public List<Product> findByIdsWithLock(List<UUID> ids) {
+        return productRepository.findByIdIn(ids);
+    }
+
+
+}

@@ -1,8 +1,9 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethod;
 import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
+import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethod;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,12 +12,14 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Entity
 @Table(name = "orders")
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter
 @SuperBuilder(toBuilder = true)
 @Where(clause = "deleted = false")
 @NoArgsConstructor
@@ -48,19 +51,17 @@ public class Order extends BaseEntity {
 
     private Instant paidAt;
 
-    private String paymentMethodName;
-
     private String paymentTransactionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_method_id")
+    private String note;
+
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private PaymentTransaction transaction;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_method_id")
+    @Enumerated(EnumType.STRING)
     private DeliveryMethod deliveryMethod;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -68,9 +69,14 @@ public class Order extends BaseEntity {
 
     public void prePersist() {
         super.prePersist();
-        if (this.status == null) {
-            this.status = OrderStatus.PENDING;
-        }
+        orderId = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("ddMMyyyy"))
+                + "ORDER"
+                + getId().toString()
+                .replace("-", "")
+                .substring(0, 8)
+                .toUpperCase();
+        status = OrderStatus.PENDING;
     }
 
 }

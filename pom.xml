@@ -39,7 +39,6 @@
         <!--        <webauthn4j-spring-security.version>0.11.2.RELEASE</webauthn4j-spring-security.version>-->
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

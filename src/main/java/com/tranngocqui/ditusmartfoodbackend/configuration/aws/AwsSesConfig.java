@@ -1,4 +1,4 @@
-package com.tranngocqui.ditusmartfoodbackend.configuration;
+package com.tranngocqui.ditusmartfoodbackend.configuration.aws;
 
 import com.tranngocqui.ditusmartfoodbackend.configuration.properties.AwsProperties;
 import lombok.RequiredArgsConstructor;

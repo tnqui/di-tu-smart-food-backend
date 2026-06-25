@@ -1,14 +1,12 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "order_items")
@@ -23,14 +21,13 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private UUID productId;
 
     private Integer quantity;
 
     private BigDecimal priceAtOrderedTime;
 
     @Column(columnDefinition = "TEXT")
-    private String note;
+    @Builder.Default
+    private String note = "";
 }

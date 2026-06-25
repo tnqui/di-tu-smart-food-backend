@@ -1,17 +1,19 @@
 package com.tranngocqui.ditusmartfoodbackend.constant;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.util.AntPathMatcher;
+
 public class PublicUrl {
     public static final String[] PUBLIC_ENDPOINTS = {
-            "/api/auth/**"
-
+            "/api/auth/**",
 //            "/test/**",
 //            "/api/payment/momo/**",
 //            "/api/orders/**",
 //            "/api/test/**",
 //            "/api/auth/**",
 //            "/api/auth/login",
-//            "/api/auth/dashboard-login",
-//            "/api/auth/2fa-setup",
+//            "/api/auth/dashboard-login"
+            //            "/api/auth/2fa-setup",
 //            "/api/auth/2fa-confirm",
 //            "/api/auth/verify-2fa",
 //            "/api/admin/auth/login",
@@ -35,5 +37,19 @@ public class PublicUrl {
 //            "/actuator/health",
 //            "/v3/api-docs/**",
 //            "/swagger-ui/**"
+
     };
+
+    public static boolean isPublicUrl(HttpServletRequest request) {
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        String path = request.getServletPath();
+
+        for (String pattern : PublicUrl.PUBLIC_ENDPOINTS) {
+            if (pathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
+

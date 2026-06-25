@@ -1,17 +1,21 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Entity
 @Table(name = "products")
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter
 @SuperBuilder(toBuilder = true)
 @Where(clause = "deleted = false")
 @NoArgsConstructor
@@ -19,31 +23,22 @@ public class Product extends BaseEntity {
     private String name;
     private String description;
     private BigDecimal price;
-    private BigDecimal oldPrice;
-    private Double rating = 5.0;
-    @Builder.Default
-    private String tag = "New";
     private Integer stock;
     private Integer preparationTime;
-    @Builder.Default
-    private Integer orderCount = 0;
-
     private String imageUrl;
-
-    @Builder.Default
-    private Boolean isFeatured = false;
-
-    @Builder.Default
-    private Integer displayOrder = 999;
-
-    @Builder.Default
-    private Boolean isAvailable = true;
-
-    @ManyToMany
-    private Set<Category> categories;
+    private Boolean isAvailable;
+    private Double rating;
+    private Integer orderCount;
 
     @ManyToOne
     @JoinColumn(name = "primary_category_Id", referencedColumnName = "id")
     private Category primaryCategory;
+
+    public void prePersist() {
+        super.prePersist();
+        rating = 0.0;
+        orderCount = 0;
+        isAvailable = true;
+    }
 
 }

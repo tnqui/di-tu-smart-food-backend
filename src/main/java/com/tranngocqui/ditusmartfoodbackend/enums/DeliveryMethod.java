@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum DeliveryMethodProvider {
+public enum DeliveryMethod {
     GHTK("Giao Hàng Tiết Kiệm"),
     GRAB("GRAB"),
     BE("BE"),

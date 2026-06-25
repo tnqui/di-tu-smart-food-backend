@@ -130,4 +130,10 @@ public class User extends BaseEntity implements UserDetails {
                 .roles(roles)
                 .build();
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s", firstName, lastName);
+    }
+
 }

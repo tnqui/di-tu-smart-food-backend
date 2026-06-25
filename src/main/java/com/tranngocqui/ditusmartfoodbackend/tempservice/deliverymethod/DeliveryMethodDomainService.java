@@ -1,14 +1,13 @@
 package com.tranngocqui.ditusmartfoodbackend.tempservice.deliverymethod;
 
-import com.tranngocqui.ditusmartfoodbackend.entity.DeliveryMethod;
-import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethodProvider;
+import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethod;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DeliveryMethodDomainService {
     DeliveryMethod getByIdOrThrow(String id);
 
-    DeliveryMethod getByCodeOrThrow(DeliveryMethodProvider code);
+    DeliveryMethod getByCodeOrThrow(DeliveryMethod code);
 
     DeliveryMethod createDeliveryMethod(DeliveryMethod deliveryMethod);
 
