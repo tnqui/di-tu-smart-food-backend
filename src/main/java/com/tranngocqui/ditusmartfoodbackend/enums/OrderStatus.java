@@ -2,12 +2,22 @@ package com.tranngocqui.ditusmartfoodbackend.enums;
 
 public enum OrderStatus {
     PENDING,
-    CONFIRMED,
-    PROCESSING,
+    CUSTOMER_CONFIRMED,
+    WAITING_FOR_PAYMENT,
     PAID,
-    CANCELLED,
-    SHIPPING,
+    RESTAURANT_CONFIRMED,
+    PREPARING,
+    READY_FOR_DELIVERY,
+    DELIVERING,
+    ARRIVED,
     DELIVERED,
-    FAILED,
-    REFUNDED
+    DELIVERY_FAILED,
+    CANCELLED,
+    REFUNDED;
+
+    public boolean canCancel() {
+        return this == PENDING || this == CUSTOMER_CONFIRMED || this == WAITING_FOR_PAYMENT || this == PAID || this == RESTAURANT_CONFIRMED;
+    }
+
+
 }

@@ -25,13 +25,13 @@ public class AuthClientController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody AuthClientRegisterRequest request) {
         authService.clientRegister(request);
-        return ResponseEntity.ok(ApiResponse.success("Verification link has been sent to your email!"));
+        return ResponseEntity.ok(ApiResponse.ok("Verification link has been sent to your email!"));
     }
 
     @GetMapping("/register/verify")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
         authService.verifyEmailVerificationLink(token);
-        return ResponseEntity.ok(ApiResponse.success("Successfully verified your email!"));
+        return ResponseEntity.ok(ApiResponse.ok("Successfully verified your email!"));
     }
 
     @PostMapping("/login")
@@ -48,14 +48,14 @@ public class AuthClientController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok(ApiResponse.success(AuthClientLoginResponse.builder()
+        return ResponseEntity.ok(ApiResponse.ok(AuthClientLoginResponse.builder()
                 .accessToken(token.accessToken())
                 .build()));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<?>> refresh(@CookieValue("refresh_token") String token) {
-        return ResponseEntity.ok(ApiResponse.success(authService.refresh(token)));
+        return ResponseEntity.ok(ApiResponse.ok(authService.refresh(token)));
     }
 
 }

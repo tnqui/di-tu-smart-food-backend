@@ -18,27 +18,27 @@ public class CategoryAdminController {
 
     @PostMapping
     ResponseEntity<ApiResponse<CategoryAdminResponse>> create(@RequestBody CategoryAdminRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(categoryService.create(request)));
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.create(request)));
     }
 
     @GetMapping("{id}")
     ResponseEntity<ApiResponse<CategoryAdminResponse>> get(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.success(categoryService.getById(id)));
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.getById(id)));
     }
 
     @GetMapping
     ResponseEntity<ApiResponse<Page<CategoryAdminResponse>>> getPagination(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(categoryService.getCategoriesPagination(pageable)));
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.getCategoriesPagination(pageable)));
     }
 
     @PatchMapping("{id}")
     ResponseEntity<ApiResponse<CategoryAdminResponse>> update(@PathVariable String id, @RequestBody CategoryAdminRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(categoryService.update(id, request)));
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.update(id, request)));
     }
 
     @DeleteMapping("{id}")
     ResponseEntity<ApiResponse<Void>> deleteById(@PathVariable String id) {
         categoryService.delete(id);
-        return ResponseEntity.ok(ApiResponse.success("Successfully deleted"));
+        return ResponseEntity.ok(ApiResponse.ok("Successfully deleted"));
     }
 }

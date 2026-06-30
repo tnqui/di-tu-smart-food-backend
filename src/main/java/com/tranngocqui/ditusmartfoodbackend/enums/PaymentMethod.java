@@ -4,10 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentMethod {
-    MOMO("MoMo"),
     COD("COD - Cash On Delivery"),
-    BANK_TRANSFER("Banking")
-    ;
+    BANK_TRANSFER("Banking");
 
     private final String provider;
 

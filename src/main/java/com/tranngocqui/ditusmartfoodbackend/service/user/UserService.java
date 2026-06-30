@@ -9,6 +9,8 @@ import com.tranngocqui.ditusmartfoodbackend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface UserService {
     User save(User user);
 
@@ -18,7 +20,7 @@ public interface UserService {
 
     User findByEmail(String email);
 
-    User findById(String id);
+    User findById(UUID id);
 
     UserAdminResponse create(UserAdminRequest request);
 
@@ -29,5 +31,7 @@ public interface UserService {
     Page<UserAdminResponse> getAll(Pageable pageable);
 
     void deleteById(String id);
+
+    User findByIdWithPermissions(UUID id);
 
 }

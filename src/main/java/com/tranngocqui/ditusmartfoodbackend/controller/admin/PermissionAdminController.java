@@ -23,30 +23,30 @@ public class PermissionAdminController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> create(@Valid @RequestBody PermissionAdminCreateRequest request) {
         permissionService.save(request);
-        return ResponseEntity.ok(ApiResponse.success("Successfully created permission"));
+        return ResponseEntity.ok(ApiResponse.ok("Successfully created permission"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PermissionAdminGetResponse>> getPermission(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.success(permissionService.findById(id)));
+        return ResponseEntity.ok(ApiResponse.ok(permissionService.findById(id)));
     }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<PermissionAdminGetResponse>>> getAllPermissions() {
-        return ResponseEntity.ok(ApiResponse.success(permissionService.findAll()));
+        return ResponseEntity.ok(ApiResponse.ok(permissionService.findAll()));
     }
 
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<PermissionAdminGetResponse>> update(@PathVariable String id, @Valid @RequestBody PermissionAdminUpdateRequest request) {
         permissionService.update(id, request);
-        return ResponseEntity.ok(ApiResponse.success("Successfully updated permission"));
+        return ResponseEntity.ok(ApiResponse.ok("Successfully updated permission"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         permissionService.softDeleteById(id);
-        return ResponseEntity.ok(ApiResponse.success("Successfully deleted permission"));
+        return ResponseEntity.ok(ApiResponse.ok("Successfully deleted permission"));
     }
 
 }

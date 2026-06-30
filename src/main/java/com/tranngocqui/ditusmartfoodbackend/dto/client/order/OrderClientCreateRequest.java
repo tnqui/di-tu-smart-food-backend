@@ -1,5 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.order;
 
+import com.tranngocqui.ditusmartfoodbackend.dto.common.ShippingAddressRequest;
 import com.tranngocqui.ditusmartfoodbackend.enums.DeliveryMethod;
 import com.tranngocqui.ditusmartfoodbackend.enums.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
@@ -23,6 +24,8 @@ public record OrderClientCreateRequest(
         DeliveryMethod deliveryMethod,
         @NotNull(message = "REQUIRED_FIELD_MISSING")
         PaymentMethod paymentMethod,
+        @NotNull(message = "REQUIRED_FIELD_MISSING")
+        ShippingAddressRequest address,
         String note
 ) {
     public record OrderItemRequest(
@@ -30,7 +33,8 @@ public record OrderClientCreateRequest(
             UUID productId,
             @NotNull(message = "REQUIRED_FIELD_MISSING")
             @Positive(message = "QUANTITY_MUST_BE_POSITIVE")
-            Integer quantity
+            Integer quantity,
+            String note
     ) {
     }
 }

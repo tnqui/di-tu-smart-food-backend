@@ -1,7 +1,7 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.client.order;
 
+import com.tranngocqui.ditusmartfoodbackend.enums.OrderItemReason;
 import com.tranngocqui.ditusmartfoodbackend.enums.OrderStatus;
-import com.tranngocqui.ditusmartfoodbackend.enums.UnavailableReason;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -17,7 +17,8 @@ public record OrderClientCreateResponse(
         BigDecimal totalAmount,
         BigDecimal shippingFee,
         Instant createdAt,
-        String shippingAddress,
+        String customerAddress,
+        String matchAddress,
         String recipientName,
         String recipientPhone,
         String paymentMethod,
@@ -39,7 +40,7 @@ public record OrderClientCreateResponse(
             String name,
             Integer requestQuantity,
             Integer stock,
-            UnavailableReason reason
+            OrderItemReason reason
     ) {
 
     }

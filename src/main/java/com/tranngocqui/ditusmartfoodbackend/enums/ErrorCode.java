@@ -70,6 +70,7 @@ public enum ErrorCode {
     WRONG_MESSAGE_CODE(1311, "Wrong message code", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PASSWORD_FORMAT(1312, "Invalid password format", HttpStatus.BAD_REQUEST),
     QUANTITY_MUST_BE_POSITIVE(1313, "Quantity must be positive", HttpStatus.BAD_REQUEST),
+    FIELD_NOT_BLANK(1314, "Field cannot blank", HttpStatus.BAD_REQUEST),
     // ========== USER MANAGEMENT ERRORS (1400-1499) ==========
     USER_NOT_FOUND(1400, "User not found", HttpStatus.NOT_FOUND),
 
@@ -91,6 +92,9 @@ public enum ErrorCode {
 
     PHONE_OR_EMAIL_INVALID(1409, "Invalid phone or email format", HttpStatus.BAD_REQUEST),
 
+    LIST_TOO_LARGE(1410, "List item too large", HttpStatus.BAD_REQUEST),
+    MISSING_LAT_OR_LNG(1411, "Missing latitude or longitude for location service", HttpStatus.BAD_REQUEST),
+    MISSING_REF_ID(1412, "Missing refId for location service", HttpStatus.BAD_REQUEST),
     // ========== PASSWORD ERRORS (1500-1599) ==========
     PASSWORD_IS_REQUIRED(1500, "Password is required", HttpStatus.BAD_REQUEST),
 
@@ -111,7 +115,7 @@ public enum ErrorCode {
     PASSWORD_CONFIRMATION_REQUIRED(1508, "Password confirmation is required", HttpStatus.BAD_REQUEST),
 
     PASSWORD_DOES_NOT_MATCH(1509, "Password does not match", HttpStatus.BAD_REQUEST),
-
+    INVALID_REF_ID(1510, "Invalid refId", HttpStatus.BAD_REQUEST),
     // ========== REGISTRATION & VERIFICATION ERRORS (1600-1699) ==========
     REGISTRATION_FAILED(1600, "Registration failed", HttpStatus.BAD_REQUEST),
 
@@ -150,6 +154,7 @@ public enum ErrorCode {
 
     ADDRESS_COUNTRY_REQUIRED(1711, "Country is required", HttpStatus.BAD_REQUEST),
 
+    ADDRESS_NOT_SUPPORTED(1712, "The address is not supported in this service area", HttpStatus.BAD_REQUEST),
     // ========== ROLE & PERMISSION ERRORS (1800-1899) ==========
     PERMISSION_NOT_FOUND(1800, "Permission not found", HttpStatus.NOT_FOUND),
 
@@ -188,6 +193,9 @@ public enum ErrorCode {
 
     EMPTY_LIST_PRODUCT(2009, "Empty list product", HttpStatus.BAD_REQUEST),
 
+    INVALID_LIST_PRODUCT(2010, "Invalid product list", HttpStatus.BAD_REQUEST),
+    ALL_PRODUCTS_OUT_OF_STOCK(2011, "All products are out of stock", HttpStatus.BAD_REQUEST),
+    DUPLICATE_PRODUCT(2012, "Duplicate product item", HttpStatus.BAD_REQUEST),
     // ========== CATEGORY ERRORS (2100-2199) ==========
     CATEGORY_NOT_FOUND(2100, "Category not found", HttpStatus.NOT_FOUND),
 
@@ -235,6 +243,9 @@ public enum ErrorCode {
     ORDER_EMPTY_LIST(2215, "All the products in your order are currently out of stock. We apologize for the inconvenience.", HttpStatus.BAD_REQUEST),
 
     NO_VALID_ORDER_ITEMS(2216, "No valid order items", HttpStatus.BAD_REQUEST),
+    ORDER_IS_PREPARING(2217, "Your order is preparing!", HttpStatus.BAD_REQUEST),
+    ORDER_IS_PROCESSING(2218, "Your order is processing!", HttpStatus.BAD_REQUEST),
+    ORDER_IN_ANOTHER_PROCESS(2219, "Order is being in another process", HttpStatus.BAD_REQUEST),
 
     // ========== PAYMENT METHOD ERRORS (2300-2399) ==========
     PAYMENT_METHOD_NOT_FOUND(2300, "Payment method not found", HttpStatus.NOT_FOUND),
@@ -380,6 +391,8 @@ public enum ErrorCode {
     GEOCODING_SERVICE_ERROR(3106, "Geocoding service error", HttpStatus.BAD_GATEWAY),
 
     GEOCODING_API_LIMIT_EXCEEDED(3107, "Geocoding API limit exceeded", HttpStatus.TOO_MANY_REQUESTS),
+
+    VIET_MAP_ERROR(3108, "Viet Map Error", HttpStatus.BAD_GATEWAY),
 
     // ========== BUSINESS LOGIC ERRORS (3200-3299) ==========
     BUSINESS_RULE_VIOLATION(3200, "Business rule violation", HttpStatus.BAD_REQUEST),

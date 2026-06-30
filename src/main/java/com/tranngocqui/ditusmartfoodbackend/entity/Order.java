@@ -24,7 +24,6 @@ import java.util.List;
 @Where(clause = "deleted = false")
 @NoArgsConstructor
 public class Order extends BaseEntity {
-
     private String orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,13 +36,17 @@ public class Order extends BaseEntity {
     @Column(precision = 15, scale = 2)
     private BigDecimal totalAmount;
 
+    private BigDecimal lineItemTotal;
+
     private BigDecimal shippingFee;
 
-    private String shippingAddress;
+    private String customerAddress;
 
     private Double latitude;
 
     private Double longitude;
+
+    private Double distance;
 
     private String recipientName;
 
@@ -51,9 +54,9 @@ public class Order extends BaseEntity {
 
     private Instant paidAt;
 
-    private String paymentTransactionId;
-
     private String note;
+
+    private String failedReason;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;

@@ -26,7 +26,7 @@ public class Product extends BaseEntity {
     private Integer stock;
     private Integer preparationTime;
     private String imageUrl;
-    private Boolean isAvailable;
+    private Boolean active;
     private Double rating;
     private Integer orderCount;
 
@@ -38,7 +38,16 @@ public class Product extends BaseEntity {
         super.prePersist();
         rating = 0.0;
         orderCount = 0;
-        isAvailable = true;
+        active = true;
     }
 
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + name + '\'' +
+                ", price=" + price +
+                ", stock=" + stock +
+                ", active=" + active +
+                '}';
+    }
 }

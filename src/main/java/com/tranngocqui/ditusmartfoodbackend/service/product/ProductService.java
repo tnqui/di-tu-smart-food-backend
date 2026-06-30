@@ -4,10 +4,12 @@ package com.tranngocqui.ditusmartfoodbackend.service.product;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductNameStockResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.auth.response.ProductClientResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,4 +37,8 @@ public interface ProductService {
     List<Product> findByIds(List<UUID> ids);
 
     List<Product> findByIdsWithLock(List<UUID> ids);
+
+    List<ProductNameStockResponse> findProductNameStock(Sort.Direction direction);
+
+
 }

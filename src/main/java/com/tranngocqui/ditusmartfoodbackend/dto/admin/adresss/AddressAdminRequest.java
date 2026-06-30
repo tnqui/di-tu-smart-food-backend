@@ -1,11 +1,12 @@
 package com.tranngocqui.ditusmartfoodbackend.dto.admin.adresss;
 
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record AddressAdminRequest(
-        String userId,
+        UUID userId,
         String houseNumber,
         String street,
         String ward,

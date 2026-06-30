@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
-        String userId = String.valueOf(object);
+        UUID userId = UUID.fromString(String.valueOf(object));
 
         User user = userService.findById(userId);
 
@@ -123,11 +123,7 @@ public class AuthServiceImpl implements AuthService {
 
         String sessionId = jwt.getClaim("sid");
 
-        String subject = jwt.getSubject();
-
-        System.out.println("SessionId" + sessionId);
-
-        System.out.println("subject" + subject);
+        UUID subject = UUID.fromString(jwt.getSubject());
 
         if (redisService.get("session:" + sessionId) == null) {
             throw new AppException(ErrorCode.SESSION_EXPIRED);

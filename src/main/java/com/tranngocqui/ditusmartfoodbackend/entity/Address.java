@@ -1,7 +1,6 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "addresses")
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter
 @SuperBuilder(toBuilder = true)
 @Where(clause = "deleted = false")
 @NoArgsConstructor
@@ -26,19 +25,19 @@ public class Address extends BaseEntity {
 
     private String houseNumber;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String street;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String ward;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String district;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String country;
 
     private Double latitude;

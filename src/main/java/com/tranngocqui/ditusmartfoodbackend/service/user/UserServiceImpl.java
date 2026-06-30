@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(String id) {
-        return userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Override
@@ -69,5 +69,10 @@ public class UserServiceImpl implements UserService {
     public void deleteById(String id) {
 
     }
-    
+
+    @Override
+    public User findByIdWithPermissions(UUID id) {
+        return userRepository.findByIdWithPermissions(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
 }

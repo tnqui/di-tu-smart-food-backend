@@ -1,6 +1,5 @@
 package com.tranngocqui.ditusmartfoodbackend.entity;
 
-import com.tranngocqui.ditusmartfoodbackend.enums.PaymentProvider;
 import com.tranngocqui.ditusmartfoodbackend.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -25,9 +24,6 @@ public class PaymentTransaction extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentProvider provider;
 
     private String transactionId;
 

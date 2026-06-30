@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -71,7 +72,10 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).toList();
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.addAll(roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).toList());
+        authorities.addAll(permissions.stream().map(p -> new SimpleGrantedAuthority(p.getName())).toList());
+        return authorities;
     }
 
     public static User clientRegister(String email, String phone, String password, String firstName, String lastName) {

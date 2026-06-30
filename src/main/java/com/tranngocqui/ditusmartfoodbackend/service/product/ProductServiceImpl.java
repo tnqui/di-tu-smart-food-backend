@@ -1,17 +1,18 @@
-package com.tranngocqui.ditusmartfoodbackend.tempservice.domain.product;
+package com.tranngocqui.ditusmartfoodbackend.service.product;
 
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminRequest;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductAdminUpdateRequest;
+import com.tranngocqui.ditusmartfoodbackend.dto.admin.product.ProductNameStockResponse;
 import com.tranngocqui.ditusmartfoodbackend.dto.client.auth.response.ProductClientResponse;
 import com.tranngocqui.ditusmartfoodbackend.entity.Product;
 import com.tranngocqui.ditusmartfoodbackend.mapper.ProductMapper;
 import com.tranngocqui.ditusmartfoodbackend.repository.ProductRepository;
-import com.tranngocqui.ditusmartfoodbackend.service.product.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,8 +75,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public List<Product> findByIdsWithLock(List<UUID> ids) {
-        return productRepository.findByIdIn(ids);
+        return productRepository.findByIdInAndDeletedIsFalse((ids));
     }
 
-
+    @Override
+    public List<ProductNameStockResponse> findProductNameStock(Sort.Direction direction) {
+        Sort sort = Sort.by(direction, "stock");
+        return productMapper.to(productRepository.findProductNameStock(sort));
+    }
 }
