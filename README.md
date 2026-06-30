@@ -2,7 +2,7 @@
 
 ## 📋 Mô tả
 
-API backend cho ứng dụng quản lý nhà hàng, hỗ trợ order tại bàn, đặt hàng online và giao hàng.
+API backend for restaurant management system.
 
 ## 🚀 Quick Start
 
